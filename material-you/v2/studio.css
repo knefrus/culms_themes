@@ -1,0 +1,1270 @@
+/* =========================================================
+   LMS — «Studio»  ·  v2
+   Google Material 3 + немного Apple: нейтральные поверхности,
+   один акцент, Google Sans везде, иконки Material Symbols.
+   Светлая тема — по умолчанию; тёмная и OLED включаются сами,
+   когда в плагине включена тёмная тема (кнопка ☀/🌙 в шапке).
+   ========================================================= */
+
+/* Google Sans — с кириллицей. @font-face, а не @import: так шрифт
+   грузится, даже если во вкладке «Палитра» что-то настроено. */
+@font-face { font-family: 'Google Sans'; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url(https://fonts.gstatic.com/s/googlesans/v71/4UasrENHsxJlGDuGo1OIlJfC6l_24rlCK1Yo_Iqcsih3SAyH6cAwhX9RPjYUvaYr.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Google Sans'; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url(https://fonts.gstatic.com/s/googlesans/v71/4UasrENHsxJlGDuGo1OIlJfC6l_24rlCK1Yo_Iqcsih3SAyH6cAwhX9RPj8UvaYr.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+@font-face { font-family: 'Google Sans'; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url(https://fonts.gstatic.com/s/googlesans/v71/4UasrENHsxJlGDuGo1OIlJfC6l_24rlCK1Yo_Iqcsih3SAyH6cAwhX9RPjIUvQ.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Google Sans'; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url(https://fonts.gstatic.com/s/googlesans/v71/4UasrENHsxJlGDuGo1OIlJfC6l_24rlCK1Yo_Iqcsih3SAyH6cAwhX9RPjwUvaYr.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+
+/* =========================================================
+   1. ТОКЕНЫ. Меняйте цвета только здесь.
+   ========================================================= */
+:root {
+  --s-font: 'Google Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* светлая */
+  --s-bg:        #F8FAFD;   /* полотно, шапка, меню */
+  --s-surface:   #FFFFFF;   /* карточки */
+  --s-surface-2: #F0F4F9;   /* чипы, поля, шапки таблиц */
+  --s-surface-3: #E9EEF6;   /* наведение на чипы */
+  --s-text:   #1F1F1F;
+  --s-text-2: #444746;
+  --s-text-3: #747775;
+  --s-line:   #E1E3E1;      /* волосяные рамки */
+  --s-line-2: #C4C7C5;      /* рамки полей и чипов */
+  --s-primary:    #0B57D0;
+  --s-primary-hi: #0842A0;
+  --s-on-primary: #FFFFFF;
+  --s-tonal:      #D3E3FD;  /* выбранный пункт меню, активный чип */
+  --s-on-tonal:   #041E49;
+  --s-success: #146C2E;
+  --s-warning: #A15C00;
+  --s-error:   #B3261E;
+  --s-info:    #0B57D0;
+  --s-hover:  rgba(31, 31, 31, .06);
+  --s-press:  rgba(31, 31, 31, .10);
+  --s-shadow-1: 0 1px 2px rgba(60,64,67,.12), 0 1px 3px 1px rgba(60,64,67,.08);
+  --s-shadow-2: 0 2px 6px 2px rgba(60,64,67,.10), 0 1px 2px rgba(60,64,67,.16);
+  --s-veil: rgba(0, 0, 0, .32);
+
+  --s-r-xl: 28px;  --s-r-l: 20px;  --s-r-m: 16px;  --s-r-s: 10px;
+  --s-ease: cubic-bezier(.2, 0, 0, 1);
+  --s-ease-dec: cubic-bezier(.05, .7, .1, 1);
+  /* пружина (линейная аппроксимация spring, как в Material 3 Expressive / iOS) */
+  --s-spring: linear(0, 0.034 1.5%, 0.142 3.4%, 0.315 5.7%, 0.554 8.7%, 0.758 11.9%, 0.893 15%, 0.982 18.5%, 1.029 22.4%, 1.044 26.4%, 1.039 31%, 1.016 39.3%, 1.002 48.4%, 0.997 59.3%, 1);
+  --s-spring-soft: linear(0, 0.022 1.6%, 0.091 3.4%, 0.211 5.6%, 0.39 8.4%, 0.586 11.6%, 0.75 15%, 0.87 18.7%, 0.95 22.8%, 0.996 27.4%, 1.016 32.6%, 1.018 38.8%, 1.008 47.6%, 1.001 59.8%, 1);
+  --s-indicator: linear-gradient(var(--s-tonal), var(--s-tonal)) center / 100% 100% no-repeat;
+}
+
+/* тёмная — когда в плагине включена тёмная тема */
+:root:has(#culms-dark-theme-style-base) {
+  --s-bg:        #131314;
+  --s-surface:   #1E1F20;
+  --s-surface-2: #282A2C;
+  --s-surface-3: #333537;
+  --s-text:   #E3E3E3;
+  --s-text-2: #C4C7C5;
+  --s-text-3: #8E918F;
+  --s-line:   #2E3032;
+  --s-line-2: #444746;
+  --s-primary:    #A8C7FA;
+  --s-primary-hi: #D3E3FD;
+  --s-on-primary: #062E6F;
+  --s-tonal:      #004A77;
+  --s-on-tonal:   #C2E7FF;
+  --s-success: #6DD58C;
+  --s-warning: #FDD663;
+  --s-error:   #F2B8B5;
+  --s-info:    #A8C7FA;
+  --s-hover:  rgba(227, 227, 227, .08);
+  --s-press:  rgba(227, 227, 227, .12);
+  --s-shadow-1: 0 1px 2px rgba(0,0,0,.4), 0 1px 3px 1px rgba(0,0,0,.25);
+  --s-shadow-2: 0 2px 6px 2px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.4);
+  --s-veil: rgba(0, 0, 0, .6);
+}
+
+/* OLED — «Чисто чёрный фон» в плагине */
+:root:has(#culms-dark-theme-style-oled) {
+  --s-bg:        #000000;
+  --s-surface:   #111112;
+  --s-surface-2: #1C1C1E;
+  --s-surface-3: #262628;
+  --s-line:      #232325;
+}
+
+
+/* =========================================================
+   2. ПЕРЕМЕННЫЕ САЙТА, TAIGA И ПЛАГИНА → токены
+   ========================================================= */
+:root,
+html body,
+html body tui-root,
+html body [tuitheme] {
+  --background: var(--s-bg) !important;
+  --background-alt: var(--s-bg) !important;
+  --background-secondary: var(--s-bg) !important;
+  --background-accent: var(--s-tonal) !important;
+  --elevation-01: var(--s-bg) !important;
+  --elevation-02: var(--s-surface) !important;
+  --elevation-03: var(--s-surface) !important;
+  --sidebar-layout-content-background-color: var(--s-bg) !important;
+  --accent: var(--s-primary) !important;
+  --accent-hover: var(--s-primary-hi) !important;
+  --accent-pressed: var(--s-primary-hi) !important;
+  --neutral: var(--s-surface-2) !important;
+  --neutral-hover: var(--s-surface-3) !important;
+  --positive: var(--s-success) !important;
+  --negative: var(--s-error) !important;
+  --warning: var(--s-warning) !important;
+  --text-primary: var(--s-text) !important;
+  --text-secondary: var(--s-text-2) !important;
+  --text-tertiary: var(--s-text-3) !important;
+  --text-link: var(--s-primary) !important;
+  --text-link-hover: var(--s-primary-hi) !important;
+  --border: var(--s-line) !important;
+  --border-hover: var(--s-line-2) !important;
+  --border-focus: var(--s-primary) !important;
+  --lightbox: var(--s-veil) !important;
+
+  --tui-font-text: var(--s-font) !important;
+  --tui-font-heading: var(--s-font) !important;
+  --tui-background-base: var(--s-surface) !important;
+  --tui-background-base-alt: var(--s-surface-2) !important;
+  --tui-background-elevation-1: var(--s-surface) !important;
+  --tui-background-elevation-2: var(--s-surface) !important;
+  --tui-background-elevation-3: var(--s-surface) !important;
+  --tui-background-accent-1: var(--s-primary) !important;
+  --tui-background-accent-1-hover: var(--s-primary-hi) !important;
+  --tui-background-accent-1-pressed: var(--s-primary-hi) !important;
+  --tui-text-primary-on-accent-1: var(--s-on-primary) !important;
+  --tui-background-neutral-1: var(--s-surface-2) !important;
+  --tui-background-neutral-1-hover: var(--s-surface-3) !important;
+  --tui-background-neutral-1-pressed: var(--s-surface-3) !important;
+  --tui-background-neutral-2: var(--s-surface-3) !important;
+  --tui-text-primary: var(--s-text) !important;
+  --tui-text-secondary: var(--s-text-2) !important;
+  --tui-text-tertiary: var(--s-text-3) !important;
+  --tui-text-action: var(--s-primary) !important;
+  --tui-text-action-hover: var(--s-primary-hi) !important;
+  --tui-text-positive: var(--s-success) !important;
+  --tui-text-negative: var(--s-error) !important;
+  --tui-status-positive: var(--s-success) !important;
+  --tui-status-negative: var(--s-error) !important;
+  --tui-status-warning: var(--s-warning) !important;
+  --tui-status-info: var(--s-info) !important;
+  --tui-border-normal: var(--s-line-2) !important;
+  --tui-border-hover: var(--s-text-3) !important;
+  --tui-border-focus: var(--s-primary) !important;
+  --tui-service-backdrop: var(--s-veil) !important;
+  --tui-radius-xs: 6px !important;
+  --tui-radius-s: 8px !important;
+  --tui-radius-m: 12px !important;
+  --tui-radius-l: 16px !important;
+  --tui-radius-xl: 24px !important;
+
+  --culms-dark-bg-primary: var(--s-bg) !important;
+  --culms-dark-bg-secondary: var(--s-surface) !important;
+  --culms-dark-bg-hover: var(--s-hover) !important;
+  --culms-dark-bg-hover-light: var(--s-surface-2) !important;
+  --culms-dark-text-primary: var(--s-text) !important;
+  --culms-dark-text-secondary: var(--s-text-2) !important;
+  --culms-dark-text-tertiary: var(--s-text-3) !important;
+  --culms-dark-text-link-hover: var(--s-primary-hi) !important;
+  --culms-dark-border-primary: var(--s-line) !important;
+  --culms-dark-border-secondary: var(--s-line-2) !important;
+  --culms-dark-border-hover: var(--s-line-2) !important;
+  --culms-dark-border-hover-light: var(--s-text-3) !important;
+  --culms-dark-status-positive: var(--s-success) !important;
+  --culms-dark-status-negative: var(--s-error) !important;
+  --culms-dark-status-in-progress: var(--s-warning) !important;
+  --culms-dark-status-neutral: var(--s-info) !important;
+  --culms-dark-status-backlog: var(--s-text-3) !important;
+  --culms-dark-status-chip-bg: var(--s-surface-2) !important;
+  --culms-status-solved: var(--s-success) !important;
+  --culms-dark-bg-seminar: var(--s-surface-2) !important;
+  --culms-dark-scrollbar-thumb: var(--s-line-2) !important;
+  --culms-dark-scrollbar-track: transparent !important;
+}
+
+
+/* =========================================================
+   3. БАЗА: шрифт, фон, выделение, фокус, скроллбар
+   ========================================================= */
+html body,
+html body :not(code, pre, pre *, kbd, samp, .katex, .katex *, mjx-container, mjx-container *, .cm-editor *, .monaco-editor *) {
+  font-family: var(--s-font) !important;
+}
+html body { -webkit-font-smoothing: antialiased; }
+
+html, html body, html body tui-root, html body cu-sidebar-layout,
+html body div.content-wrapper, html body main.main {
+  background: var(--s-bg) !important;
+  color: var(--s-text);
+}
+html body div.content-wrapper { border: none !important; box-shadow: none !important; }
+/* у страниц LMS свой серый фон-обёртка — убираем, чтобы фон был один */
+html body div.sidebar__content > * { background-color: transparent !important; }
+/* заголовки страниц — 500, как в Google/Apple, а не жирные 700 */
+html body main.main h1 { font-weight: 500 !important; letter-spacing: -.2px; }
+
+::selection { background: color-mix(in srgb, var(--s-primary) 28%, transparent); }
+html { scrollbar-color: var(--s-line-2) transparent; scrollbar-width: thin; }
+
+html body :is(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--s-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* иконки Taiga рисуются маской — подменяем картинку на Material */
+/* названия иконок LMS → Material Symbols. Новая иконка: добавьте строку по образцу */
+html body [data-icon-start="cuIconBookOpen01"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z%22%3E%3C/path%3E%3Cpath d=%22M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83M17.5 14.33c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBookOpen01"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z%22%3E%3C/path%3E%3Cpath d=%22M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83M17.5 14.33c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .cu-navtab__main-element_active[data-icon-start="cuIconBookOpen01"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z%22%3E%3C/path%3E%3Cpath d=%22M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83M17.5 14.33c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconFile07"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m0 16H5V5h14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconFile07"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m0 16H5V5h14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .cu-navtab__main-element_active[data-icon-start="cuIconFile07"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M9 17H7v-7h2zm4 0h-2V7h2zm4 0h-2v-4h2z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconFolder"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M7 15h7v2H7zm0-4h10v2H7zm0-4h10v2H7zm12-4h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-.14 0-.27.01-.4.04a2.01 2.01 0 0 0-1.44 1.19c-.1.23-.16.49-.16.77v14c0 .27.06.54.16.78s.25.45.43.64c.27.27.62.47 1.01.55.13.02.26.03.4.03h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-7-.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75M19 19H5V5h14z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconFolder"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M7 15h7v2H7zm0-4h10v2H7zm0-4h10v2H7zm12-4h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-.14 0-.27.01-.4.04a2.01 2.01 0 0 0-1.44 1.19c-.1.23-.16.49-.16.77v14c0 .27.06.54.16.78s.25.45.43.64c.27.27.62.47 1.01.55.13.02.26.03.4.03h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-7-.25c.41 0 .75.34.75.75s-.34.75-.75.75-.75-.34-.75-.75.34-.75.75-.75M19 19H5V5h14z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .cu-navtab__main-element_active[data-icon-start="cuIconFolder"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m2 14H7v-2h7zm3-4H7v-2h10zm0-4H7V7h10z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconCalendar"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 16H5V10h14zm0-12H5V6h14zM9 14H7v-2h2zm4 0h-2v-2h2zm4 0h-2v-2h2zm-8 4H7v-2h2zm4 0h-2v-2h2zm4 0h-2v-2h2z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconCalendar"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 16H5V10h14zm0-12H5V6h14zM9 14H7v-2h2zm4 0h-2v-2h2zm4 0h-2v-2h2zm-8 4H7v-2h2zm4 0h-2v-2h2zm4 0h-2v-2h2z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .cu-navtab__main-element_active[data-icon-start="cuIconCalendar"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 16H5V10h14zM9 14H7v-2h2zm4 0h-2v-2h2zm4 0h-2v-2h2zm-8 4H7v-2h2zm4 0h-2v-2h2zm4 0h-2v-2h2z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconClipboardCheck"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cg fill-rule=%22evenodd%22%3E%3Cpath d=%22M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m0 16H4V5h16z%22%3E%3C/path%3E%3Cpath d=%22M19.41 10.42 17.99 9l-3.17 3.17-1.41-1.42L12 12.16 14.82 15zM5 7h5v2H5zM5 11h5v2H5zM5 15h5v2H5z%22%3E%3C/path%3E%3C/g%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconClipboardCheck"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cg fill-rule=%22evenodd%22%3E%3Cpath d=%22M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m0 16H4V5h16z%22%3E%3C/path%3E%3Cpath d=%22M19.41 10.42 17.99 9l-3.17 3.17-1.41-1.42L12 12.16 14.82 15zM5 7h5v2H5zM5 11h5v2H5zM5 15h5v2H5z%22%3E%3C/path%3E%3C/g%3E%3C/svg%3E") !important; }
+html body .cu-navtab__main-element_active[data-icon-start="cuIconClipboardCheck"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath fill-rule=%22evenodd%22 d=%22M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M10 17H5v-2h5zm0-4H5v-2h5zm0-4H5V7h5zm4.82 6L12 12.16l1.41-1.41 1.41 1.42L17.99 9l1.42 1.42z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconUserLeft01"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M11 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4m0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2M5 18c.2-.63 2.57-1.68 4.96-1.94l2.04-2a9 9 0 0 0-1-.06c-2.67 0-8 1.34-8 4v2h9l-2-2zm15.6-5.5-5.13 5.17-2.07-2.08L12 17l3.47 3.5L22 13.91z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconUserLeft01"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M11 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4m0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2M5 18c.2-.63 2.57-1.68 4.96-1.94l2.04-2a9 9 0 0 0-1-.06c-2.67 0-8 1.34-8 4v2h9l-2-2zm15.6-5.5-5.13 5.17-2.07-2.08L12 17l3.47 3.5L22 13.91z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .cu-navtab__main-element_active[data-icon-start="cuIconUserLeft01"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cg fill-rule=%22evenodd%22%3E%3Cpath d=%22m9 17 3-2.94a9 9 0 0 0-1-.06c-2.67 0-8 1.34-8 4v2h9zm2-5c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4M15.47 20.5 12 17l1.4-1.41 2.07 2.08 5.13-5.17 1.4 1.41z%22%3E%3C/path%3E%3C/g%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconChevronDown"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconChevronDown"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconChevronUp"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconChevronUp"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconChevronLeft"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconChevronLeft"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconChevronRight"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconChevronRight"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconBell"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2m6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBell"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2m6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconCalendarPlus01"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m0 16H5V9h14zM5 7V5h14v2zm5.56 10.46 5.93-5.93-1.06-1.06-4.87 4.87-2.11-2.11-1.06 1.06z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconCalendarPlus01"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m0 16H5V9h14zM5 7V5h14v2zm5.56 10.46 5.93-5.93-1.06-1.06-4.87 4.87-2.11-2.11-1.06 1.06z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconSearchSm"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconSearchSm"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconSearchMd"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconSearchMd"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconXClose"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconXClose"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconClockStopWatch"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15 1H9v2h6zm-4 13h2V8h-2zm8.03-6.61 1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.96 8.96 0 0 0 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a8.994 8.994 0 0 0 7.03-14.61M12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconClockStopWatch"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15 1H9v2h6zm-4 13h2V8h-2zm8.03-6.61 1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.96 8.96 0 0 0 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a8.994 8.994 0 0 0 7.03-14.61M12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconSlashCircle01"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2M4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12m8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.42-3.58 8-8 8%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconSlashCircle01"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2M4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12m8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.42-3.58 8-8 8%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconDownload01"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3zm-1-4-1.41-1.41L13 12.17V4h-2v8.17L8.41 9.59 7 11l5 5z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconDownload01"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3zm-1-4-1.41-1.41L13 12.17V4h-2v8.17L8.41 9.59 7 11l5 5z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconBrandMath"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBrandMath"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconBrandChip"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22m15.82 7.22-1 .4c-.21-.16-.43-.29-.67-.39L14 6.17c-.02-.1-.1-.17-.2-.17h-1.6c-.1 0-.18.07-.19.17l-.15 1.06c-.24.1-.47.23-.67.39l-1-.4c-.09-.03-.2 0-.24.09l-.8 1.38a.2.2 0 0 0 .05.26l.85.66c-.03.12-.05.26-.05.39q0 .195.03.39l-.84.66a.19.19 0 0 0-.05.25l.8 1.39c.05.09.15.12.25.09l.99-.4c.21.16.43.29.68.39l.14 1.06c.02.1.1.17.2.17h1.6c.1 0 .18-.07.2-.17l.15-1.06c.24-.1.47-.23.67-.39l.99.4c.09.04.2 0 .24-.09l.8-1.39c.05-.09.03-.19-.05-.25l-.83-.66a2.6 2.6 0 0 0 0-.78l.85-.66a.2.2 0 0 0 .05-.26l-.8-1.38c-.05-.09-.16-.12-.25-.09M13 11.43a1.43 1.43 0 1 1 0-2.86 1.43 1.43 0 0 1 0 2.86%22%3E%3C/path%3E%3Cpath d=%22M19.94 9.06c-.43-3.27-3.23-5.86-6.53-6.05C13.27 3 13.14 3 13 3 9.47 3 6.57 5.61 6.08 9l-1.93 3.48c-.41.66.07 1.52.85 1.52h1v2c0 1.1.9 2 2 2h1v3h7v-4.68a7.02 7.02 0 0 0 3.94-7.26m-5.05 5.57-.89.42V19h-3v-3H8v-4H6.7l1.33-2.33C8.21 7.06 10.35 5 13 5c2.76 0 5 2.24 5 5 0 2.09-1.29 3.88-3.11 4.63%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBrandChip"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22m15.82 7.22-1 .4c-.21-.16-.43-.29-.67-.39L14 6.17c-.02-.1-.1-.17-.2-.17h-1.6c-.1 0-.18.07-.19.17l-.15 1.06c-.24.1-.47.23-.67.39l-1-.4c-.09-.03-.2 0-.24.09l-.8 1.38a.2.2 0 0 0 .05.26l.85.66c-.03.12-.05.26-.05.39q0 .195.03.39l-.84.66a.19.19 0 0 0-.05.25l.8 1.39c.05.09.15.12.25.09l.99-.4c.21.16.43.29.68.39l.14 1.06c.02.1.1.17.2.17h1.6c.1 0 .18-.07.2-.17l.15-1.06c.24-.1.47-.23.67-.39l.99.4c.09.04.2 0 .24-.09l.8-1.39c.05-.09.03-.19-.05-.25l-.83-.66a2.6 2.6 0 0 0 0-.78l.85-.66a.2.2 0 0 0 .05-.26l-.8-1.38c-.05-.09-.16-.12-.25-.09M13 11.43a1.43 1.43 0 1 1 0-2.86 1.43 1.43 0 0 1 0 2.86%22%3E%3C/path%3E%3Cpath d=%22M19.94 9.06c-.43-3.27-3.23-5.86-6.53-6.05C13.27 3 13.14 3 13 3 9.47 3 6.57 5.61 6.08 9l-1.93 3.48c-.41.66.07 1.52.85 1.52h1v2c0 1.1.9 2 2 2h1v3h7v-4.68a7.02 7.02 0 0 0 3.94-7.26m-5.05 5.57-.89.42V19h-3v-3H8v-4H6.7l1.33-2.33C8.21 7.06 10.35 5 13 5c2.76 0 5 2.24 5 5 0 2.09-1.29 3.88-3.11 4.63%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconBrandAcademic"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 3 1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9zm6.82 6L12 12.72 5.18 9 12 5.28zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBrandAcademic"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 3 1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9zm6.82 6L12 12.72 5.18 9 12 5.28zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconBrandBriefcase"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M20 7h-4V5l-2-2h-4L8 5v2H4c-1.1 0-2 .9-2 2v5c0 .75.4 1.38 1 1.73V19c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-3.28c.59-.35 1-.99 1-1.72V9c0-1.1-.9-2-2-2M10 5h4v2h-4zM4 9h16v5h-5v-3H9v3H4zm9 6h-2v-2h2zm6 4H5v-3h4v1h6v-1h4z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBrandBriefcase"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M20 7h-4V5l-2-2h-4L8 5v2H4c-1.1 0-2 .9-2 2v5c0 .75.4 1.38 1 1.73V19c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-3.28c.59-.35 1-.99 1-1.72V9c0-1.1-.9-2-2-2M10 5h4v2h-4zM4 9h16v5h-5v-3H9v3H4zm9 6h-2v-2h2zm6 4H5v-3h4v1h6v-1h4z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconBrandDoc"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zm4 18H6V4h7v5h5z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBrandDoc"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zm4 18H6V4h7v5h5z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconBrandMessage"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15 4v7H5.17L4 12.17V4zm1-2H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1m5 4h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBrandMessage"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15 4v7H5.17L4 12.17V4zm1-2H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1m5 4h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-start="cuIconBrandCode"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body [data-icon-end="cuIconBrandCode"] { --t-icon-end: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body a.cu-navtab__main-element[aria-label="Клубы ЦУ"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M4 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m1.13 1.1c-.37-.06-.74-.1-1.13-.1-.99 0-1.93.21-2.78.58A2.01 2.01 0 0 0 0 16.43V18h4.5v-1.61c0-.83.23-1.61.63-2.29M20 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m4 3.43c0-.81-.48-1.53-1.22-1.85A6.95 6.95 0 0 0 20 14c-.39 0-.76.04-1.13.1.4.68.63 1.46.63 2.29V18H24zm-7.76-2.78c-1.17-.52-2.61-.9-4.24-.9s-3.07.39-4.24.9A2.99 2.99 0 0 0 6 16.39V18h12v-1.61c0-1.18-.68-2.26-1.76-2.74M8.07 16c.09-.23.13-.39.91-.69.97-.38 1.99-.56 3.02-.56s2.05.18 3.02.56c.77.3.81.46.91.69zM12 8c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m0-2c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body a.cu-navtab__main-element_active[aria-label="Клубы ЦУ"] { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 12.75c1.63 0 3.07.39 4.24.9 1.08.48 1.76 1.56 1.76 2.73V18H6v-1.61c0-1.18.68-2.26 1.76-2.73 1.17-.52 2.61-.91 4.24-.91M4 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m1.13 1.1c-.37-.06-.74-.1-1.13-.1-.99 0-1.93.21-2.78.58A2.01 2.01 0 0 0 0 16.43V18h4.5v-1.61c0-.83.23-1.61.63-2.29M20 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m4 3.43c0-.81-.48-1.53-1.22-1.85A6.95 6.95 0 0 0 20 14c-.39 0-.76.04-1.13.1.4.68.63 1.46.63 2.29V18H24zM12 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3%22%3E%3C/path%3E%3C/svg%3E") !important; }
+/* кнопка меню: «гамбургер», в развёрнутом — «свернуть» */
+html body .static-content-top__header button.navtab { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M3 18h18v-2H3zm0-5h18v-2H3zm0-7v2h18V6z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body cu-sidebar.expanded .static-content-top__header button.navtab { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M3 18h13v-2H3zm0-5h10v-2H3zm0-7v2h13V6zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+/* переключатель темы плагина */
+html body [automation-id="header-action-theme-toggle"] button { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M9.37 5.51A7.4 7.4 0 0 0 9.1 7.5c0 4.08 3.32 7.4 7.4 7.4.68 0 1.35-.09 1.99-.27A7.01 7.01 0 0 1 12 19c-3.86 0-7-3.14-7-7 0-2.93 1.81-5.45 4.37-6.49M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1%22%3E%3C/path%3E%3C/svg%3E") !important; }
+:root:has(#culms-dark-theme-style-base) [automation-id="header-action-theme-toggle"] button { --t-icon-start: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 9c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3m0-2c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5M2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1m18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1M11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1m0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1M5.99 4.58a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41zm12.37 12.37a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 0 0 0-1.41zm1.06-10.96a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0zM7.05 18.36a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+
+
+/* =========================================================
+   4. ШАПКА — Top app bar
+   ========================================================= */
+html body header.header,
+html body cu-header,
+html body div.header__navigation-bar {
+  background: var(--s-bg) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+html body a.header__tab-link,
+html body tui-tabs-with-more.header__tabs button.t-more {
+  height: 40px !important;
+  padding: 0 16px !important;
+  border-radius: 999px !important;
+  color: var(--s-text-2) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+  transition: background .2s var(--s-ease), color .2s var(--s-ease);
+}
+html body a.header__tab-link::after,
+html body a.header__tab-link::before { display: none !important; }
+html body a.header__tab-link:not(.header__tab-link_active):hover,
+html body tui-tabs-with-more.header__tabs button.t-more:hover {
+  background: var(--s-hover) !important;
+  color: var(--s-text) !important;
+}
+html body a.header__tab-link.header__tab-link_active {
+  background: var(--s-indicator) !important;
+  color: var(--s-on-tonal) !important;
+}
+html body tui-tabs.t-tabs { box-shadow: none !important; gap: 2px; }
+
+/* правые действия: круглые кнопки 40px, Late days — чип */
+html body ul.header__actions-list { gap: 4px !important; align-items: center !important; }
+html body ul.header__actions-list .button-action {
+  width: 40px !important; height: 40px !important;
+  border-radius: 50% !important;
+  color: var(--s-text-2) !important;
+}
+html body ul.header__actions-list .button-action:hover { background: var(--s-hover) !important; }
+html body cu-late-days-balance .badge {
+  height: 32px !important;
+  padding: 0 12px !important;
+  gap: 6px !important;
+  background: transparent !important;
+  border: 1px solid var(--s-line-2) !important;
+  border-radius: var(--s-r-s) !important;
+  box-shadow: none !important;
+  color: var(--s-text) !important;
+  font-weight: 500 !important;
+  font-variant-numeric: tabular-nums;
+}
+html body cu-user-profile-menu .cu-avatar {
+  background: var(--s-tonal) !important;
+  color: var(--s-on-tonal) !important;
+  box-shadow: none !important;
+}
+
+
+/* =========================================================
+   5. ЛЕВОЕ МЕНЮ
+   Свёрнутое — Navigation rail: иконка в «пилюле», подпись под ней.
+   Развёрнутое — Navigation drawer: строки-пилюли.
+   ========================================================= */
+html body cu-sidebar,
+html body cu-sidebar div.content,
+html body div.static-content,
+html body div.static-content-top,
+html body div.static-content-top__header,
+html body div.dynamic-content {
+  background: var(--s-bg) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* общее для пунктов */
+html body a.cu-navtab__main-element,
+html body .static-content-top__header button.navtab {
+  color: var(--s-text-2) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transition: background .2s var(--s-ease), color .2s var(--s-ease);
+}
+html body a.cu-navtab__main-element::before,
+html body .static-content-top__header button.navtab::before {
+  width: 24px !important; height: 24px !important;
+  transform: none !important;
+}
+
+/* у LMS своя подсветка на обёртке пункта — из-за неё было два серых фона */
+:root, html body { --navigation-background-color-hover: transparent !important; }
+html body .cu-navtab.cu-navtab.cu-navtab:hover:not(a):not(button) { background-color: transparent !important; }
+
+/* --- rail (свёрнуто) --- */
+html body cu-sidebar.collapsed,
+html body cu-sidebar.collapsed div.content,
+html body cu-sidebar.collapsed div.static-content {
+  width: 92px !important; min-width: 92px !important; max-width: 92px !important;
+}
+html body cu-sidebar.collapsed .static-content-top,
+html body cu-sidebar.collapsed .static-content-top__body {
+  width: 100% !important; padding: 0 !important; margin: 0 !important;
+}
+html body cu-sidebar.collapsed div.static-content nav.navigation-tree,
+html body cu-sidebar.collapsed div.static-content li.nav-list__item,
+html body cu-sidebar.collapsed div.static-content cu-sidebar-tree-item,
+html body cu-sidebar.collapsed div.static-content cu-navtab {
+  width: 100% !important; max-width: none !important;
+  margin: 0 !important; padding: 0 !important;
+  display: flex !important; flex-direction: column !important; align-items: center !important;
+}
+html body cu-sidebar.collapsed div.static-content nav.navigation-tree ul.nav-list {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding-top: 4px !important;
+}
+html body cu-sidebar.collapsed div.static-content a.cu-navtab__main-element {
+  position: relative !important;
+  width: 56px !important; min-width: 56px !important; max-width: 56px !important;
+  flex: none !important;
+  display: flex !important; justify-content: center !important; align-items: center !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border-radius: 16px !important;
+  margin-bottom: 18px !important;
+  overflow: visible !important;
+}
+html body cu-sidebar.collapsed div.static-content a.cu-navtab__main-element::after {
+  content: attr(aria-label) !important;
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 88px !important;
+  display: block !important;
+  background: none !important;
+  -webkit-mask: none !important; mask: none !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 14px !important;
+  letter-spacing: -.1px !important;
+  color: var(--s-text-2) !important;
+  white-space: normal !important;
+  pointer-events: none;
+}
+html body cu-sidebar.collapsed div.static-content a.cu-navtab__main-element:hover:not(.cu-navtab__main-element_active) {
+  background: var(--s-hover) !important;
+  color: var(--s-text) !important;
+}
+html body cu-sidebar.collapsed div.static-content a.cu-navtab__main-element.cu-navtab__main-element_active {
+  background: var(--s-indicator) !important;
+  color: var(--s-on-tonal) !important;
+}
+html body cu-sidebar.collapsed div.static-content a.cu-navtab__main-element.cu-navtab__main-element_active::after {
+  color: var(--s-text) !important;
+  font-weight: 700 !important;
+}
+html body cu-sidebar.collapsed .static-content-top__header {
+  display: flex !important; justify-content: center !important;
+  padding: 8px 0 12px !important;
+}
+html body cu-sidebar.collapsed .static-content-top__header button.navtab {
+  width: 48px !important; height: 48px !important; border-radius: 50% !important;
+}
+html body cu-sidebar.collapsed .static-content-top__header button.navtab:hover { background: var(--s-hover) !important; }
+
+/* выезжающее подменю у rail (наведение на «Курсы», «Ведомости»…) */
+html body cu-sidebar.collapsed div.dynamic-content {
+  left: 92px !important;
+  width: 280px !important;
+  padding: 16px 12px !important;
+  gap: 4px !important;
+  background: var(--s-surface) !important;
+  border: 1px solid var(--s-line) !important;
+  border-radius: 0 var(--s-r-l) var(--s-r-l) 0 !important;
+  box-shadow: var(--s-shadow-2) !important;
+  animation: s-flyout .22s var(--s-ease-dec);
+}
+html body cu-sidebar div.dynamic-content > span {
+  padding: 0 12px 8px !important;
+  font-size: 14px !important; font-weight: 500 !important; color: var(--s-text-2) !important;
+}
+html body cu-sidebar div.dynamic-content a.cu-navtab__main-element {
+  height: 40px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  font-size: 14px !important; font-weight: 500 !important;
+}
+html body cu-sidebar div.dynamic-content a.cu-navtab__main-element::after { content: none !important; }
+html body cu-sidebar div.dynamic-content a.cu-navtab__main-element:hover:not(.cu-navtab__main-element_active) { background: var(--s-hover) !important; }
+html body cu-sidebar div.dynamic-content a.cu-navtab__main-element.cu-navtab__main-element_active {
+  background: var(--s-tonal) !important; color: var(--s-on-tonal) !important;
+}
+html body cu-sidebar div.dynamic-content .counter {
+  margin-left: auto !important;
+  padding: 0 8px !important; border-radius: 999px !important;
+  background: var(--s-surface-2) !important; color: var(--s-text-2) !important;
+  font-size: 12px !important; font-variant-numeric: tabular-nums;
+}
+@keyframes s-flyout { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+/* --- drawer (развёрнуто) --- */
+html body cu-sidebar.expanded nav.navigation-tree ul.nav-list { padding: 0 12px !important; }
+html body cu-sidebar.expanded a.cu-navtab__main-element,
+html body cu-sidebar.expanded .static-content-top__header button.navtab {
+  height: 48px !important;
+  border-radius: 999px !important;
+  padding: 0 16px !important;
+  gap: 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+html body cu-sidebar.expanded a.cu-navtab__main-element:hover:not(.cu-navtab__main-element_active),
+html body cu-sidebar.expanded .static-content-top__header button.navtab:hover {
+  background: var(--s-hover) !important; color: var(--s-text) !important;
+}
+html body cu-sidebar.expanded a.cu-navtab__main-element.cu-navtab__main-element_active {
+  background: var(--s-indicator) !important;
+  color: var(--s-on-tonal) !important;
+  font-weight: 700 !important;
+}
+html body .cu-navtab__main-element-text { font-size: 14px !important; font-weight: inherit !important; }
+
+
+/* =========================================================
+   6. «МОИ КУРСЫ» — новая раскладка
+   ┌ заголовок + фильтры ──────────┬ Ближайшее ┐
+   │ сетка курсов                  │ (липкая)  │
+   Справа — дэшборд контрольных и дедлайнов плагина, если он включён.
+   Узкое окно — одна колонка: заголовок, дедлайны, курсы.
+   ========================================================= */
+html body cu-course-learning-layout:has(cu-courses-group) div.content-container {
+  width: 100% !important;
+  max-width: 1480px !important;
+  margin: 0 auto !important;
+  padding: 8px 16px 48px !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "side" "list";
+  gap: 20px 32px !important;
+  align-items: start !important;
+}
+html body cu-course-learning-layout:has(cu-courses-group) div.content-container > router-outlet { display: none !important; }
+html body cu-course-learning-layout:has(cu-courses-group) cu-courses-group { display: contents !important; }
+html body cu-course-learning-layout:has(cu-courses-group) section.header-island { grid-area: head; }
+html body cu-course-learning-layout:has(cu-courses-group) cu-courses-group > tui-loader { grid-area: list; min-width: 0; }
+html body cu-course-learning-layout:has(cu-courses-group) .culms-exams-dashboard { grid-area: side; margin: 0 !important; }
+
+@media (min-width: 1280px) {
+  html body cu-course-learning-layout:has(.culms-exams-dashboard) div.content-container {
+    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-areas: "head side" "list side";
+    grid-template-rows: auto 1fr;
+  }
+  html body cu-course-learning-layout .culms-exams-dashboard {
+    position: sticky !important;
+    top: 16px !important;
+    max-height: calc(100vh - 112px);
+    overflow: auto;
+    scrollbar-width: none;
+  }
+}
+
+/* заголовок страницы — без «островка», как в приложениях Google/Apple */
+html body cu-course-learning-layout section.header-island {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 8px 0 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px 24px !important;
+}
+html body section.header-island h1.title {
+  margin: 0 !important;
+  font-size: 32px !important;
+  line-height: 40px !important;
+  font-weight: 500 !important;
+  letter-spacing: -.2px !important;
+  color: var(--s-text) !important;
+}
+html body section.header-island cu-tabs { min-width: 0; }
+
+/* фильтр-чипы */
+html body section.header-island .tabs-container { gap: 8px !important; }
+html body section.header-island a.tab {
+  height: 32px !important;
+  padding: 0 14px !important;
+  border-radius: var(--s-r-s) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: inset 0 0 0 1px var(--s-line-2) !important;
+  color: var(--s-text-2) !important;
+  transition: background .2s var(--s-ease), padding .2s var(--s-ease);
+}
+html body section.header-island a.tab span { font-size: 13.5px !important; font-weight: 500 !important; }
+html body section.header-island a.tab:hover { background: var(--s-hover) !important; }
+html body section.header-island a.tab.active {
+  padding-left: 8px !important;
+  background: var(--s-indicator) !important;
+  box-shadow: none !important;
+  color: var(--s-on-tonal) !important;
+}
+html body section.header-island a.tab.active::before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 18px !important; height: 18px !important;
+  margin-right: 6px !important;
+  background: currentColor !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z%22%3E%3C/path%3E%3C/svg%3E") center / contain no-repeat !important;
+          mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z%22%3E%3C/path%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+/* --- сетка курсов (старый дизайн плагина: обложка + подпись) --- */
+html body ul.course-list.culms-old-design {
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)) !important;
+  gap: 28px 20px !important;
+  padding: 0 !important;
+}
+html body ul.course-list.culms-old-design > li.course-list__item { gap: 10px !important; }
+html body ul.course-list.culms-old-design cu-course-card {
+  border-radius: var(--s-r-m) !important;
+  transition: transform .25s var(--s-ease), box-shadow .25s var(--s-ease) !important;
+}
+html body ul.course-list.culms-old-design li.course-list__item:hover cu-course-card {
+  transform: translateY(-3px);
+  box-shadow: var(--s-shadow-2) !important;
+}
+html body .culms-cover {
+  border-radius: var(--s-r-m) !important;
+  transform: none !important;
+}
+html body .culms-cover__img { transition: transform .4s var(--s-ease) !important; }
+html body li.course-list__item:hover .culms-cover__img { transform: scale(1.04) !important; }
+html body .culms-old-title {
+  padding: 0 2px !important;
+  color: var(--s-text) !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 500 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden !important;
+  cursor: pointer;
+}
+html body li.course-list__item:hover .culms-old-title { color: var(--s-primary) !important; }
+
+/* заглушки без своей картинки — тональные цвета M3 + фигура */
+html body .culms-cover:not(.culms-cover--custom) {
+  background: var(--cv-bg, var(--s-surface-2)) !important;
+}
+html body .culms-cover:not(.culms-cover--custom)::before {
+  content: "";
+  position: absolute;
+  height: 64%; aspect-ratio: 1;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%) rotate(var(--cv-rot, 0deg));
+  background: var(--cv-shape, var(--s-surface-3));
+  -webkit-mask: var(--cv-mask) center / contain no-repeat;
+          mask: var(--cv-mask) center / contain no-repeat;
+  transition: transform .6s var(--s-ease);
+}
+html body li.course-list__item:hover .culms-cover:not(.culms-cover--custom)::before {
+  transform: translate(-50%, -50%) rotate(calc(var(--cv-rot, 0deg) + 30deg));
+}
+html body .culms-cover .culms-cover__placeholder {
+  position: static !important;
+  padding: 0 !important;
+  color: var(--cv-ink, var(--s-text-2)) !important;
+}
+html body .culms-cover__cat-icon {
+  position: relative; z-index: 1;
+  width: 34px !important; height: 34px !important;
+}
+/* категория — маленький чип в углу */
+html body .culms-cover__cat-name {
+  position: absolute !important;
+  top: 10px; left: 10px; z-index: 1;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--cv-ink, #000) 12%, transparent) !important;
+  white-space: nowrap;
+  font-size: 11px !important; font-weight: 600 !important;
+  line-height: 16px !important; opacity: 1 !important;
+}
+html body .culms-cover[data-culms-category="mathematics"] { --cv-bg: #EADDFF; --cv-shape: #D0BCFF; --cv-ink: #381E72; --cv-rot: 0deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M92.4,50.0 L92.2,51.5 L91.5,52.9 L90.5,54.3 L89.4,55.5 L88.2,56.7 L87.2,57.9 L86.5,59.1 L86.2,60.4 L86.2,61.8 L86.5,63.3 L86.9,64.9 L87.2,66.6 L87.4,68.2 L87.3,69.8 L86.7,71.2 L85.8,72.4 L84.5,73.3 L83.0,73.9 L81.3,74.5 L79.7,74.9 L78.3,75.5 L77.1,76.2 L76.2,77.1 L75.5,78.3 L74.9,79.7 L74.5,81.3 L73.9,83.0 L73.3,84.5 L72.4,85.8 L71.2,86.7 L69.8,87.3 L68.2,87.4 L66.6,87.2 L64.9,86.9 L63.3,86.5 L61.8,86.2 L60.4,86.2 L59.1,86.5 L57.9,87.2 L56.7,88.2 L55.5,89.4 L54.3,90.5 L52.9,91.5 L51.5,92.2 L50.0,92.4 L48.5,92.2 L47.1,91.5 L45.7,90.5 L44.5,89.4 L43.3,88.2 L42.1,87.2 L40.9,86.5 L39.6,86.2 L38.2,86.2 L36.7,86.5 L35.1,86.9 L33.4,87.2 L31.8,87.4 L30.2,87.3 L28.8,86.7 L27.6,85.8 L26.7,84.5 L26.1,83.0 L25.5,81.3 L25.1,79.7 L24.5,78.3 L23.8,77.1 L22.9,76.2 L21.7,75.5 L20.3,74.9 L18.7,74.5 L17.0,73.9 L15.5,73.3 L14.2,72.4 L13.3,71.2 L12.7,69.8 L12.6,68.2 L12.8,66.6 L13.1,64.9 L13.5,63.3 L13.8,61.8 L13.8,60.4 L13.5,59.1 L12.8,57.9 L11.8,56.7 L10.6,55.5 L9.5,54.3 L8.5,52.9 L7.8,51.5 L7.6,50.0 L7.8,48.5 L8.5,47.1 L9.5,45.7 L10.6,44.5 L11.8,43.3 L12.8,42.1 L13.5,40.9 L13.8,39.6 L13.8,38.2 L13.5,36.7 L13.1,35.1 L12.8,33.4 L12.6,31.8 L12.7,30.2 L13.3,28.8 L14.2,27.6 L15.5,26.7 L17.0,26.1 L18.7,25.5 L20.3,25.1 L21.7,24.5 L22.9,23.8 L23.8,22.9 L24.5,21.7 L25.1,20.3 L25.5,18.7 L26.1,17.0 L26.7,15.5 L27.6,14.2 L28.8,13.3 L30.2,12.7 L31.8,12.6 L33.4,12.8 L35.1,13.1 L36.7,13.5 L38.2,13.8 L39.6,13.8 L40.9,13.5 L42.1,12.8 L43.3,11.8 L44.5,10.6 L45.7,9.5 L47.1,8.5 L48.5,7.8 L50.0,7.6 L51.5,7.8 L52.9,8.5 L54.3,9.5 L55.5,10.6 L56.7,11.8 L57.9,12.8 L59.1,13.5 L60.4,13.8 L61.8,13.8 L63.3,13.5 L64.9,13.1 L66.6,12.8 L68.2,12.6 L69.8,12.7 L71.2,13.3 L72.4,14.2 L73.3,15.5 L73.9,17.0 L74.5,18.7 L74.9,20.3 L75.5,21.7 L76.2,22.9 L77.1,23.8 L78.3,24.5 L79.7,25.1 L81.3,25.5 L83.0,26.1 L84.5,26.7 L85.8,27.6 L86.7,28.8 L87.3,30.2 L87.4,31.8 L87.2,33.4 L86.9,35.1 L86.5,36.7 L86.2,38.2 L86.2,39.6 L86.5,40.9 L87.2,42.1 L88.2,43.3 L89.4,44.5 L90.5,45.7 L91.5,47.1 L92.2,48.5Z%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="mathematics"] { --cv-bg: #2B2150; --cv-shape: #463A7E; --cv-ink: #EADDFF; }
+html body .culms-cover[data-culms-category="mathematics"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .culms-cover[data-culms-category="ml"] { --cv-bg: #D3E3FD; --cv-shape: #A8C7FA; --cv-ink: #041E49; --cv-rot: 0deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M95.6,50.0 L95.4,51.6 L94.6,53.1 L93.5,54.6 L92.0,55.9 L90.3,57.1 L88.6,58.2 L86.8,59.2 L85.1,60.1 L83.7,61.0 L82.6,61.9 L81.9,62.9 L81.5,64.0 L81.5,65.4 L81.8,66.9 L82.2,68.6 L82.8,70.5 L83.3,72.5 L83.8,74.5 L84.0,76.6 L83.9,78.5 L83.5,80.2 L82.8,81.6 L81.6,82.8 L80.2,83.5 L78.5,83.9 L76.6,84.0 L74.5,83.8 L72.5,83.3 L70.5,82.8 L68.6,82.2 L66.9,81.8 L65.4,81.5 L64.0,81.5 L62.9,81.9 L61.9,82.6 L61.0,83.7 L60.1,85.1 L59.2,86.8 L58.2,88.6 L57.1,90.3 L55.9,92.0 L54.6,93.5 L53.1,94.6 L51.6,95.4 L50.0,95.6 L48.4,95.4 L46.9,94.6 L45.4,93.5 L44.1,92.0 L42.9,90.3 L41.8,88.6 L40.8,86.8 L39.9,85.1 L39.0,83.7 L38.1,82.6 L37.1,81.9 L36.0,81.5 L34.6,81.5 L33.1,81.8 L31.4,82.2 L29.5,82.8 L27.5,83.3 L25.5,83.8 L23.4,84.0 L21.5,83.9 L19.8,83.5 L18.4,82.8 L17.2,81.6 L16.5,80.2 L16.1,78.5 L16.0,76.6 L16.2,74.5 L16.7,72.5 L17.2,70.5 L17.8,68.6 L18.2,66.9 L18.5,65.4 L18.5,64.0 L18.1,62.9 L17.4,61.9 L16.3,61.0 L14.9,60.1 L13.2,59.2 L11.4,58.2 L9.7,57.1 L8.0,55.9 L6.5,54.6 L5.4,53.1 L4.6,51.6 L4.4,50.0 L4.6,48.4 L5.4,46.9 L6.5,45.4 L8.0,44.1 L9.7,42.9 L11.4,41.8 L13.2,40.8 L14.9,39.9 L16.3,39.0 L17.4,38.1 L18.1,37.1 L18.5,36.0 L18.5,34.6 L18.2,33.1 L17.8,31.4 L17.2,29.5 L16.7,27.5 L16.2,25.5 L16.0,23.4 L16.1,21.5 L16.5,19.8 L17.2,18.4 L18.4,17.2 L19.8,16.5 L21.5,16.1 L23.4,16.0 L25.5,16.2 L27.5,16.7 L29.5,17.2 L31.4,17.8 L33.1,18.2 L34.6,18.5 L36.0,18.5 L37.1,18.1 L38.1,17.4 L39.0,16.3 L39.9,14.9 L40.8,13.2 L41.8,11.4 L42.9,9.7 L44.1,8.0 L45.4,6.5 L46.9,5.4 L48.4,4.6 L50.0,4.4 L51.6,4.6 L53.1,5.4 L54.6,6.5 L55.9,8.0 L57.1,9.7 L58.2,11.4 L59.2,13.2 L60.1,14.9 L61.0,16.3 L61.9,17.4 L62.9,18.1 L64.0,18.5 L65.4,18.5 L66.9,18.2 L68.6,17.8 L70.5,17.2 L72.5,16.7 L74.5,16.2 L76.6,16.0 L78.5,16.1 L80.2,16.5 L81.6,17.2 L82.8,18.4 L83.5,19.8 L83.9,21.5 L84.0,23.4 L83.8,25.5 L83.3,27.5 L82.8,29.5 L82.2,31.4 L81.8,33.1 L81.5,34.6 L81.5,36.0 L81.9,37.1 L82.6,38.1 L83.7,39.0 L85.1,39.9 L86.8,40.8 L88.6,41.8 L90.3,42.9 L92.0,44.1 L93.5,45.4 L94.6,46.9 L95.4,48.4Z%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="ml"] { --cv-bg: #0F2647; --cv-shape: #1F4479; --cv-ink: #D3E3FD; }
+html body .culms-cover[data-culms-category="ml"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22m15.82 7.22-1 .4c-.21-.16-.43-.29-.67-.39L14 6.17c-.02-.1-.1-.17-.2-.17h-1.6c-.1 0-.18.07-.19.17l-.15 1.06c-.24.1-.47.23-.67.39l-1-.4c-.09-.03-.2 0-.24.09l-.8 1.38a.2.2 0 0 0 .05.26l.85.66c-.03.12-.05.26-.05.39q0 .195.03.39l-.84.66a.19.19 0 0 0-.05.25l.8 1.39c.05.09.15.12.25.09l.99-.4c.21.16.43.29.68.39l.14 1.06c.02.1.1.17.2.17h1.6c.1 0 .18-.07.2-.17l.15-1.06c.24-.1.47-.23.67-.39l.99.4c.09.04.2 0 .24-.09l.8-1.39c.05-.09.03-.19-.05-.25l-.83-.66a2.6 2.6 0 0 0 0-.78l.85-.66a.2.2 0 0 0 .05-.26l-.8-1.38c-.05-.09-.16-.12-.25-.09M13 11.43a1.43 1.43 0 1 1 0-2.86 1.43 1.43 0 0 1 0 2.86%22%3E%3C/path%3E%3Cpath d=%22M19.94 9.06c-.43-3.27-3.23-5.86-6.53-6.05C13.27 3 13.14 3 13 3 9.47 3 6.57 5.61 6.08 9l-1.93 3.48c-.41.66.07 1.52.85 1.52h1v2c0 1.1.9 2 2 2h1v3h7v-4.68a7.02 7.02 0 0 0 3.94-7.26m-5.05 5.57-.89.42V19h-3v-3H8v-4H6.7l1.33-2.33C8.21 7.06 10.35 5 13 5c2.76 0 5 2.24 5 5 0 2.09-1.29 3.88-3.11 4.63%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .culms-cover[data-culms-category="general"] { --cv-bg: #FFDBCB; --cv-shape: #FFB693; --cv-ink: #3A0B00; --cv-rot: 10deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M92.0,50.0 L91.9,51.5 L91.8,52.9 L91.5,54.4 L91.1,55.8 L90.7,57.2 L90.1,58.5 L89.5,59.8 L88.8,61.1 L88.0,62.4 L87.3,63.6 L86.5,64.7 L85.6,65.9 L84.8,67.0 L84.0,68.1 L83.1,69.1 L82.3,70.2 L81.5,71.3 L80.7,72.3 L80.0,73.4 L79.2,74.5 L78.4,75.6 L77.7,76.7 L76.9,77.8 L76.1,79.0 L75.3,80.1 L74.4,81.2 L73.5,82.4 L72.6,83.4 L71.6,84.5 L70.5,85.5 L69.4,86.5 L68.2,87.3 L67.0,88.1 L65.7,88.8 L64.4,89.4 L63.0,89.9 L61.6,90.3 L60.1,90.6 L58.7,90.8 L57.2,90.9 L55.7,90.9 L54.3,90.8 L52.8,90.6 L51.4,90.3 L50.0,90.0 L48.6,89.6 L47.3,89.2 L45.9,88.8 L44.6,88.3 L43.3,87.9 L42.0,87.4 L40.8,87.0 L39.5,86.6 L38.3,86.1 L37.0,85.7 L35.7,85.3 L34.4,85.0 L33.1,84.6 L31.8,84.2 L30.5,83.8 L29.2,83.3 L27.8,82.9 L26.5,82.4 L25.2,81.8 L23.8,81.2 L22.6,80.5 L21.3,79.7 L20.1,78.9 L19.0,77.9 L17.9,76.9 L16.9,75.8 L16.0,74.7 L15.2,73.5 L14.5,72.2 L13.9,70.9 L13.3,69.5 L12.9,68.1 L12.5,66.7 L12.3,65.2 L12.1,63.8 L12.0,62.4 L11.9,60.9 L11.9,59.5 L11.9,58.1 L11.9,56.7 L11.9,55.4 L11.9,54.0 L12.0,52.7 L12.0,51.3 L12.0,50.0 L12.0,48.7 L12.0,47.3 L11.9,46.0 L11.9,44.6 L11.9,43.3 L11.9,41.9 L11.9,40.5 L11.9,39.1 L12.0,37.6 L12.1,36.2 L12.3,34.8 L12.5,33.3 L12.9,31.9 L13.3,30.5 L13.9,29.1 L14.5,27.8 L15.2,26.5 L16.0,25.3 L16.9,24.2 L17.9,23.1 L19.0,22.1 L20.1,21.1 L21.3,20.3 L22.6,19.5 L23.8,18.8 L25.2,18.2 L26.5,17.6 L27.8,17.1 L29.2,16.7 L30.5,16.2 L31.8,15.8 L33.1,15.4 L34.4,15.0 L35.7,14.7 L37.0,14.3 L38.3,13.9 L39.5,13.4 L40.8,13.0 L42.0,12.6 L43.3,12.1 L44.6,11.7 L45.9,11.2 L47.3,10.8 L48.6,10.4 L50.0,10.0 L51.4,9.7 L52.8,9.4 L54.3,9.2 L55.7,9.1 L57.2,9.1 L58.7,9.2 L60.1,9.4 L61.6,9.7 L63.0,10.1 L64.4,10.6 L65.7,11.2 L67.0,11.9 L68.2,12.7 L69.4,13.5 L70.5,14.5 L71.6,15.5 L72.6,16.6 L73.5,17.6 L74.4,18.8 L75.3,19.9 L76.1,21.0 L76.9,22.2 L77.7,23.3 L78.4,24.4 L79.2,25.5 L80.0,26.6 L80.7,27.7 L81.5,28.7 L82.3,29.8 L83.1,30.9 L84.0,31.9 L84.8,33.0 L85.6,34.1 L86.5,35.3 L87.3,36.4 L88.0,37.6 L88.8,38.9 L89.5,40.2 L90.1,41.5 L90.7,42.8 L91.1,44.2 L91.5,45.6 L91.8,47.1 L91.9,48.5Z%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="general"] { --cv-bg: #3A2016; --cv-shape: #683523; --cv-ink: #FFDBCB; }
+html body .culms-cover[data-culms-category="general"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 3 1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9zm6.82 6L12 12.72 5.18 9 12 5.28zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .culms-cover[data-culms-category="business"] { --cv-bg: #C4EED0; --cv-shape: #8BD6A4; --cv-ink: #072711; --cv-rot: 45deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M98.0,50.0 L97.9,51.7 L97.6,53.3 L97.0,54.9 L96.3,56.5 L95.4,58.0 L94.4,59.4 L93.2,60.8 L91.8,62.0 L90.4,63.1 L88.9,64.2 L87.3,65.1 L85.8,65.9 L84.2,66.7 L82.7,67.4 L81.2,68.0 L79.7,68.6 L78.4,69.1 L77.1,69.7 L76.0,70.3 L74.9,70.9 L73.9,71.5 L73.0,72.2 L72.2,73.0 L71.5,73.9 L70.9,74.9 L70.3,76.0 L69.7,77.1 L69.1,78.4 L68.6,79.7 L68.0,81.2 L67.4,82.7 L66.7,84.2 L65.9,85.8 L65.1,87.3 L64.2,88.9 L63.1,90.4 L62.0,91.8 L60.8,93.2 L59.4,94.4 L58.0,95.4 L56.5,96.3 L54.9,97.0 L53.3,97.6 L51.7,97.9 L50.0,98.0 L48.3,97.9 L46.7,97.6 L45.1,97.0 L43.5,96.3 L42.0,95.4 L40.6,94.4 L39.2,93.2 L38.0,91.8 L36.9,90.4 L35.8,88.9 L34.9,87.3 L34.1,85.8 L33.3,84.2 L32.6,82.7 L32.0,81.2 L31.4,79.7 L30.9,78.4 L30.3,77.1 L29.7,76.0 L29.1,74.9 L28.5,73.9 L27.8,73.0 L27.0,72.2 L26.1,71.5 L25.1,70.9 L24.0,70.3 L22.9,69.7 L21.6,69.1 L20.3,68.6 L18.8,68.0 L17.3,67.4 L15.8,66.7 L14.2,65.9 L12.7,65.1 L11.1,64.2 L9.6,63.1 L8.2,62.0 L6.8,60.8 L5.6,59.4 L4.6,58.0 L3.7,56.5 L3.0,54.9 L2.4,53.3 L2.1,51.7 L2.0,50.0 L2.1,48.3 L2.4,46.7 L3.0,45.1 L3.7,43.5 L4.6,42.0 L5.6,40.6 L6.8,39.2 L8.2,38.0 L9.6,36.9 L11.1,35.8 L12.7,34.9 L14.2,34.1 L15.8,33.3 L17.3,32.6 L18.8,32.0 L20.3,31.4 L21.6,30.9 L22.9,30.3 L24.0,29.7 L25.1,29.1 L26.1,28.5 L27.0,27.8 L27.8,27.0 L28.5,26.1 L29.1,25.1 L29.7,24.0 L30.3,22.9 L30.9,21.6 L31.4,20.3 L32.0,18.8 L32.6,17.3 L33.3,15.8 L34.1,14.2 L34.9,12.7 L35.8,11.1 L36.9,9.6 L38.0,8.2 L39.2,6.8 L40.6,5.6 L42.0,4.6 L43.5,3.7 L45.1,3.0 L46.7,2.4 L48.3,2.1 L50.0,2.0 L51.7,2.1 L53.3,2.4 L54.9,3.0 L56.5,3.7 L58.0,4.6 L59.4,5.6 L60.8,6.8 L62.0,8.2 L63.1,9.6 L64.2,11.1 L65.1,12.7 L65.9,14.2 L66.7,15.8 L67.4,17.3 L68.0,18.8 L68.6,20.3 L69.1,21.6 L69.7,22.9 L70.3,24.0 L70.9,25.1 L71.5,26.1 L72.2,27.0 L73.0,27.8 L73.9,28.5 L74.9,29.1 L76.0,29.7 L77.1,30.3 L78.4,30.9 L79.7,31.4 L81.2,32.0 L82.7,32.6 L84.2,33.3 L85.8,34.1 L87.3,34.9 L88.9,35.8 L90.4,36.9 L91.8,38.0 L93.2,39.2 L94.4,40.6 L95.4,42.0 L96.3,43.5 L97.0,45.1 L97.6,46.7 L97.9,48.3Z%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="business"] { --cv-bg: #122E1C; --cv-shape: #235236; --cv-ink: #C4EED0; }
+html body .culms-cover[data-culms-category="business"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M20 7h-4V5l-2-2h-4L8 5v2H4c-1.1 0-2 .9-2 2v5c0 .75.4 1.38 1 1.73V19c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-3.28c.59-.35 1-.99 1-1.72V9c0-1.1-.9-2-2-2M10 5h4v2h-4zM4 9h16v5h-5v-3H9v3H4zm9 6h-2v-2h2zm6 4H5v-3h4v1h6v-1h4z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .culms-cover[data-culms-category="softSkills"] { --cv-bg: #E2F5A6; --cv-shape: #C6E07A; --cv-ink: #1C2400; --cv-rot: 0deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M91.6,50.0 L91.5,51.4 L91.2,52.9 L90.7,54.3 L90.1,55.6 L89.4,56.9 L88.6,58.2 L87.9,59.4 L87.2,60.7 L86.6,61.9 L86.1,63.1 L85.7,64.4 L85.4,65.7 L85.1,67.1 L84.9,68.5 L84.6,70.0 L84.3,71.5 L83.9,72.9 L83.4,74.3 L82.7,75.6 L81.9,76.7 L80.9,77.8 L79.7,78.7 L78.4,79.5 L77.1,80.1 L75.7,80.6 L74.3,81.1 L73.0,81.6 L71.6,82.1 L70.4,82.6 L69.2,83.3 L68.1,84.0 L67.0,84.8 L65.9,85.7 L64.8,86.6 L63.7,87.6 L62.5,88.5 L61.3,89.4 L60.0,90.1 L58.6,90.6 L57.2,91.0 L55.8,91.1 L54.3,91.1 L52.9,90.8 L51.4,90.5 L50.0,90.0 L48.6,89.5 L47.3,89.0 L46.0,88.5 L44.6,88.1 L43.3,87.8 L42.0,87.6 L40.6,87.6 L39.2,87.5 L37.8,87.6 L36.3,87.6 L34.8,87.5 L33.3,87.4 L31.9,87.1 L30.5,86.7 L29.2,86.0 L28.0,85.2 L26.9,84.2 L25.9,83.1 L25.1,81.9 L24.3,80.6 L23.6,79.4 L22.9,78.1 L22.2,76.9 L21.4,75.7 L20.6,74.7 L19.7,73.7 L18.7,72.8 L17.6,71.8 L16.5,70.9 L15.4,70.0 L14.2,69.0 L13.2,67.9 L12.3,66.8 L11.5,65.6 L10.9,64.2 L10.5,62.8 L10.3,61.4 L10.3,59.9 L10.4,58.4 L10.6,56.9 L10.9,55.5 L11.2,54.1 L11.4,52.7 L11.5,51.3 L11.6,50.0 L11.5,48.7 L11.4,47.3 L11.2,45.9 L10.9,44.5 L10.6,43.1 L10.4,41.6 L10.3,40.1 L10.3,38.6 L10.5,37.2 L10.9,35.8 L11.5,34.4 L12.3,33.2 L13.2,32.1 L14.2,31.0 L15.4,30.0 L16.5,29.1 L17.6,28.2 L18.7,27.2 L19.7,26.3 L20.6,25.3 L21.4,24.3 L22.2,23.1 L22.9,21.9 L23.6,20.6 L24.3,19.4 L25.1,18.1 L25.9,16.9 L26.9,15.8 L28.0,14.8 L29.2,14.0 L30.5,13.3 L31.9,12.9 L33.3,12.6 L34.8,12.5 L36.3,12.4 L37.8,12.4 L39.2,12.5 L40.6,12.4 L42.0,12.4 L43.3,12.2 L44.6,11.9 L46.0,11.5 L47.3,11.0 L48.6,10.5 L50.0,10.0 L51.4,9.5 L52.9,9.2 L54.3,8.9 L55.8,8.9 L57.2,9.0 L58.6,9.4 L60.0,9.9 L61.3,10.6 L62.5,11.5 L63.7,12.4 L64.8,13.4 L65.9,14.3 L67.0,15.2 L68.1,16.0 L69.2,16.7 L70.4,17.4 L71.6,17.9 L73.0,18.4 L74.3,18.9 L75.7,19.4 L77.1,19.9 L78.4,20.5 L79.7,21.3 L80.9,22.2 L81.9,23.3 L82.7,24.4 L83.4,25.7 L83.9,27.1 L84.3,28.5 L84.6,30.0 L84.9,31.5 L85.1,32.9 L85.4,34.3 L85.7,35.6 L86.1,36.9 L86.6,38.1 L87.2,39.3 L87.9,40.6 L88.6,41.8 L89.4,43.1 L90.1,44.4 L90.7,45.7 L91.2,47.1 L91.5,48.6Z%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="softSkills"] { --cv-bg: #252D0B; --cv-shape: #414E15; --cv-ink: #E2F5A6; }
+html body .culms-cover[data-culms-category="softSkills"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M15 4v7H5.17L4 12.17V4zm1-2H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1m5 4h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .culms-cover[data-culms-category="development"] { --cv-bg: #F8D8FF; --cv-shape: #E9B5FF; --cv-ink: #2F0C3A; --cv-rot: 8deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect x=%228%22 y=%228%22 width=%2284%22 height=%2284%22 rx=%2226%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="development"] { --cv-bg: #30173A; --cv-shape: #583270; --cv-ink: #F8D8FF; }
+html body .culms-cover[data-culms-category="development"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .culms-cover[data-culms-category="stem"] { --cv-bg: #C8F1EE; --cv-shape: #8FD6D1; --cv-ink: #00201E; --cv-rot: 22deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M95.6,50.0 L95.4,51.6 L94.6,53.1 L93.5,54.6 L92.0,55.9 L90.3,57.1 L88.6,58.2 L86.8,59.2 L85.1,60.1 L83.7,61.0 L82.6,61.9 L81.9,62.9 L81.5,64.0 L81.5,65.4 L81.8,66.9 L82.2,68.6 L82.8,70.5 L83.3,72.5 L83.8,74.5 L84.0,76.6 L83.9,78.5 L83.5,80.2 L82.8,81.6 L81.6,82.8 L80.2,83.5 L78.5,83.9 L76.6,84.0 L74.5,83.8 L72.5,83.3 L70.5,82.8 L68.6,82.2 L66.9,81.8 L65.4,81.5 L64.0,81.5 L62.9,81.9 L61.9,82.6 L61.0,83.7 L60.1,85.1 L59.2,86.8 L58.2,88.6 L57.1,90.3 L55.9,92.0 L54.6,93.5 L53.1,94.6 L51.6,95.4 L50.0,95.6 L48.4,95.4 L46.9,94.6 L45.4,93.5 L44.1,92.0 L42.9,90.3 L41.8,88.6 L40.8,86.8 L39.9,85.1 L39.0,83.7 L38.1,82.6 L37.1,81.9 L36.0,81.5 L34.6,81.5 L33.1,81.8 L31.4,82.2 L29.5,82.8 L27.5,83.3 L25.5,83.8 L23.4,84.0 L21.5,83.9 L19.8,83.5 L18.4,82.8 L17.2,81.6 L16.5,80.2 L16.1,78.5 L16.0,76.6 L16.2,74.5 L16.7,72.5 L17.2,70.5 L17.8,68.6 L18.2,66.9 L18.5,65.4 L18.5,64.0 L18.1,62.9 L17.4,61.9 L16.3,61.0 L14.9,60.1 L13.2,59.2 L11.4,58.2 L9.7,57.1 L8.0,55.9 L6.5,54.6 L5.4,53.1 L4.6,51.6 L4.4,50.0 L4.6,48.4 L5.4,46.9 L6.5,45.4 L8.0,44.1 L9.7,42.9 L11.4,41.8 L13.2,40.8 L14.9,39.9 L16.3,39.0 L17.4,38.1 L18.1,37.1 L18.5,36.0 L18.5,34.6 L18.2,33.1 L17.8,31.4 L17.2,29.5 L16.7,27.5 L16.2,25.5 L16.0,23.4 L16.1,21.5 L16.5,19.8 L17.2,18.4 L18.4,17.2 L19.8,16.5 L21.5,16.1 L23.4,16.0 L25.5,16.2 L27.5,16.7 L29.5,17.2 L31.4,17.8 L33.1,18.2 L34.6,18.5 L36.0,18.5 L37.1,18.1 L38.1,17.4 L39.0,16.3 L39.9,14.9 L40.8,13.2 L41.8,11.4 L42.9,9.7 L44.1,8.0 L45.4,6.5 L46.9,5.4 L48.4,4.6 L50.0,4.4 L51.6,4.6 L53.1,5.4 L54.6,6.5 L55.9,8.0 L57.1,9.7 L58.2,11.4 L59.2,13.2 L60.1,14.9 L61.0,16.3 L61.9,17.4 L62.9,18.1 L64.0,18.5 L65.4,18.5 L66.9,18.2 L68.6,17.8 L70.5,17.2 L72.5,16.7 L74.5,16.2 L76.6,16.0 L78.5,16.1 L80.2,16.5 L81.6,17.2 L82.8,18.4 L83.5,19.8 L83.9,21.5 L84.0,23.4 L83.8,25.5 L83.3,27.5 L82.8,29.5 L82.2,31.4 L81.8,33.1 L81.5,34.6 L81.5,36.0 L81.9,37.1 L82.6,38.1 L83.7,39.0 L85.1,39.9 L86.8,40.8 L88.6,41.8 L90.3,42.9 L92.0,44.1 L93.5,45.4 L94.6,46.9 L95.4,48.4Z%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="stem"] { --cv-bg: #0E2E2C; --cv-shape: #1E4F4B; --cv-ink: #C8F1EE; }
+html body .culms-cover[data-culms-category="stem"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6%22%3E%3C/path%3E%3C/svg%3E") !important; }
+html body .culms-cover[data-culms-category="design"] { --cv-bg: #E8E1EE; --cv-shape: #CDC3D8; --cv-ink: #251F2C; --cv-rot: 15deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M92.4,50.0 L92.2,51.5 L91.5,52.9 L90.5,54.3 L89.4,55.5 L88.2,56.7 L87.2,57.9 L86.5,59.1 L86.2,60.4 L86.2,61.8 L86.5,63.3 L86.9,64.9 L87.2,66.6 L87.4,68.2 L87.3,69.8 L86.7,71.2 L85.8,72.4 L84.5,73.3 L83.0,73.9 L81.3,74.5 L79.7,74.9 L78.3,75.5 L77.1,76.2 L76.2,77.1 L75.5,78.3 L74.9,79.7 L74.5,81.3 L73.9,83.0 L73.3,84.5 L72.4,85.8 L71.2,86.7 L69.8,87.3 L68.2,87.4 L66.6,87.2 L64.9,86.9 L63.3,86.5 L61.8,86.2 L60.4,86.2 L59.1,86.5 L57.9,87.2 L56.7,88.2 L55.5,89.4 L54.3,90.5 L52.9,91.5 L51.5,92.2 L50.0,92.4 L48.5,92.2 L47.1,91.5 L45.7,90.5 L44.5,89.4 L43.3,88.2 L42.1,87.2 L40.9,86.5 L39.6,86.2 L38.2,86.2 L36.7,86.5 L35.1,86.9 L33.4,87.2 L31.8,87.4 L30.2,87.3 L28.8,86.7 L27.6,85.8 L26.7,84.5 L26.1,83.0 L25.5,81.3 L25.1,79.7 L24.5,78.3 L23.8,77.1 L22.9,76.2 L21.7,75.5 L20.3,74.9 L18.7,74.5 L17.0,73.9 L15.5,73.3 L14.2,72.4 L13.3,71.2 L12.7,69.8 L12.6,68.2 L12.8,66.6 L13.1,64.9 L13.5,63.3 L13.8,61.8 L13.8,60.4 L13.5,59.1 L12.8,57.9 L11.8,56.7 L10.6,55.5 L9.5,54.3 L8.5,52.9 L7.8,51.5 L7.6,50.0 L7.8,48.5 L8.5,47.1 L9.5,45.7 L10.6,44.5 L11.8,43.3 L12.8,42.1 L13.5,40.9 L13.8,39.6 L13.8,38.2 L13.5,36.7 L13.1,35.1 L12.8,33.4 L12.6,31.8 L12.7,30.2 L13.3,28.8 L14.2,27.6 L15.5,26.7 L17.0,26.1 L18.7,25.5 L20.3,25.1 L21.7,24.5 L22.9,23.8 L23.8,22.9 L24.5,21.7 L25.1,20.3 L25.5,18.7 L26.1,17.0 L26.7,15.5 L27.6,14.2 L28.8,13.3 L30.2,12.7 L31.8,12.6 L33.4,12.8 L35.1,13.1 L36.7,13.5 L38.2,13.8 L39.6,13.8 L40.9,13.5 L42.1,12.8 L43.3,11.8 L44.5,10.6 L45.7,9.5 L47.1,8.5 L48.5,7.8 L50.0,7.6 L51.5,7.8 L52.9,8.5 L54.3,9.5 L55.5,10.6 L56.7,11.8 L57.9,12.8 L59.1,13.5 L60.4,13.8 L61.8,13.8 L63.3,13.5 L64.9,13.1 L66.6,12.8 L68.2,12.6 L69.8,12.7 L71.2,13.3 L72.4,14.2 L73.3,15.5 L73.9,17.0 L74.5,18.7 L74.9,20.3 L75.5,21.7 L76.2,22.9 L77.1,23.8 L78.3,24.5 L79.7,25.1 L81.3,25.5 L83.0,26.1 L84.5,26.7 L85.8,27.6 L86.7,28.8 L87.3,30.2 L87.4,31.8 L87.2,33.4 L86.9,35.1 L86.5,36.7 L86.2,38.2 L86.2,39.6 L86.5,40.9 L87.2,42.1 L88.2,43.3 L89.4,44.5 L90.5,45.7 L91.5,47.1 L92.2,48.5Z%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="design"] { --cv-bg: #28232E; --cv-shape: #463E50; --cv-ink: #E8E1EE; }
+html body .culms-cover[data-culms-category="design"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0 1 12 22m0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5a.54.54 0 0 0-.14-.35c-.41-.46-.63-1.05-.63-1.65a2.5 2.5 0 0 1 2.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7%22%3E%3C/path%3E%3Ccircle cx=%226.5%22 cy=%2211.5%22 r=%221.5%22%3E%3C/circle%3E%3Ccircle cx=%229.5%22 cy=%227.5%22 r=%221.5%22%3E%3C/circle%3E%3Ccircle cx=%2214.5%22 cy=%227.5%22 r=%221.5%22%3E%3C/circle%3E%3Ccircle cx=%2217.5%22 cy=%2211.5%22 r=%221.5%22%3E%3C/circle%3E%3C/svg%3E") !important; }
+html body .culms-cover[data-culms-category="withoutCategory"] { --cv-bg: #E9EEF6; --cv-shape: #D3DBE7; --cv-ink: #3C4350; --cv-rot: 30deg; --cv-mask: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M92.0,50.0 L91.9,51.5 L91.8,52.9 L91.5,54.4 L91.1,55.8 L90.7,57.2 L90.1,58.5 L89.5,59.8 L88.8,61.1 L88.0,62.4 L87.3,63.6 L86.5,64.7 L85.6,65.9 L84.8,67.0 L84.0,68.1 L83.1,69.1 L82.3,70.2 L81.5,71.3 L80.7,72.3 L80.0,73.4 L79.2,74.5 L78.4,75.6 L77.7,76.7 L76.9,77.8 L76.1,79.0 L75.3,80.1 L74.4,81.2 L73.5,82.4 L72.6,83.4 L71.6,84.5 L70.5,85.5 L69.4,86.5 L68.2,87.3 L67.0,88.1 L65.7,88.8 L64.4,89.4 L63.0,89.9 L61.6,90.3 L60.1,90.6 L58.7,90.8 L57.2,90.9 L55.7,90.9 L54.3,90.8 L52.8,90.6 L51.4,90.3 L50.0,90.0 L48.6,89.6 L47.3,89.2 L45.9,88.8 L44.6,88.3 L43.3,87.9 L42.0,87.4 L40.8,87.0 L39.5,86.6 L38.3,86.1 L37.0,85.7 L35.7,85.3 L34.4,85.0 L33.1,84.6 L31.8,84.2 L30.5,83.8 L29.2,83.3 L27.8,82.9 L26.5,82.4 L25.2,81.8 L23.8,81.2 L22.6,80.5 L21.3,79.7 L20.1,78.9 L19.0,77.9 L17.9,76.9 L16.9,75.8 L16.0,74.7 L15.2,73.5 L14.5,72.2 L13.9,70.9 L13.3,69.5 L12.9,68.1 L12.5,66.7 L12.3,65.2 L12.1,63.8 L12.0,62.4 L11.9,60.9 L11.9,59.5 L11.9,58.1 L11.9,56.7 L11.9,55.4 L11.9,54.0 L12.0,52.7 L12.0,51.3 L12.0,50.0 L12.0,48.7 L12.0,47.3 L11.9,46.0 L11.9,44.6 L11.9,43.3 L11.9,41.9 L11.9,40.5 L11.9,39.1 L12.0,37.6 L12.1,36.2 L12.3,34.8 L12.5,33.3 L12.9,31.9 L13.3,30.5 L13.9,29.1 L14.5,27.8 L15.2,26.5 L16.0,25.3 L16.9,24.2 L17.9,23.1 L19.0,22.1 L20.1,21.1 L21.3,20.3 L22.6,19.5 L23.8,18.8 L25.2,18.2 L26.5,17.6 L27.8,17.1 L29.2,16.7 L30.5,16.2 L31.8,15.8 L33.1,15.4 L34.4,15.0 L35.7,14.7 L37.0,14.3 L38.3,13.9 L39.5,13.4 L40.8,13.0 L42.0,12.6 L43.3,12.1 L44.6,11.7 L45.9,11.2 L47.3,10.8 L48.6,10.4 L50.0,10.0 L51.4,9.7 L52.8,9.4 L54.3,9.2 L55.7,9.1 L57.2,9.1 L58.7,9.2 L60.1,9.4 L61.6,9.7 L63.0,10.1 L64.4,10.6 L65.7,11.2 L67.0,11.9 L68.2,12.7 L69.4,13.5 L70.5,14.5 L71.6,15.5 L72.6,16.6 L73.5,17.6 L74.4,18.8 L75.3,19.9 L76.1,21.0 L76.9,22.2 L77.7,23.3 L78.4,24.4 L79.2,25.5 L80.0,26.6 L80.7,27.7 L81.5,28.7 L82.3,29.8 L83.1,30.9 L84.0,31.9 L84.8,33.0 L85.6,34.1 L86.5,35.3 L87.3,36.4 L88.0,37.6 L88.8,38.9 L89.5,40.2 L90.1,41.5 L90.7,42.8 L91.1,44.2 L91.5,45.6 L91.8,47.1 L91.9,48.5Z%22/%3E%3C/svg%3E"); }
+:root:has(#culms-dark-theme-style-base) body .culms-cover[data-culms-category="withoutCategory"] { --cv-bg: #232629; --cv-shape: #383D44; --cv-ink: #C4C7C5; }
+html body .culms-cover[data-culms-category="withoutCategory"] .culms-cover__cat-icon { --culms-cover-icon: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zm4 18H6V4h7v5h5z%22%3E%3C/path%3E%3C/svg%3E") !important; }
+
+/* --- родной дизайн карточек (если «старый дизайн» в плагине выключен) --- */
+html body ul.course-list:not(.culms-old-design) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 16px !important;
+}
+html body ul.course-list:not(.culms-old-design) cu-course-card.course-list__card {
+  height: 100% !important;
+  box-sizing: border-box !important;
+  padding: 16px !important;
+  background: var(--s-surface) !important;
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-r-m) !important;
+  box-shadow: none !important;
+  transition: box-shadow .25s var(--s-ease), border-color .25s var(--s-ease) !important;
+}
+html body ul.course-list:not(.culms-old-design) cu-course-card.course-list__card:hover {
+  border-color: transparent !important;
+  box-shadow: var(--s-shadow-2) !important;
+}
+html body cu-course-card .course-name { font-weight: 500 !important; }
+
+/* --- «Ближайшее»: дедлайны + контрольные — как сводка в Google Calendar --- */
+html body .culms-exams-dashboard,
+html body .culms-exams-dashboard.culms-exams-dashboard--dark {
+  --culms-ed-bg: var(--s-surface);
+  --culms-ed-border: var(--s-line);
+  --culms-ed-card-bg: transparent;
+  --culms-ed-card-border: transparent;
+  --culms-ed-text: var(--s-text);
+  --culms-ed-muted: var(--s-text-3);
+  --culms-ed-chip-bg: transparent;
+  --culms-ed-chip-border: transparent;
+  --culms-ed-divider: var(--s-line);
+  --culms-ed-accent: var(--s-primary);
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-r-l) !important;
+  box-shadow: none !important;
+}
+html body .culms-exams-dashboard .culms-exams-dashboard__inner {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  padding: 20px !important;
+}
+/* шапка: заголовок слева, стрелки недель справа */
+html body .culms-exams-dashboard .culms-exams-dashboard__head {
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+html body .culms-exams-dashboard .culms-exams-dashboard__title {
+  font-size: 16px !important; line-height: 24px !important; font-weight: 500 !important;
+  color: var(--s-text) !important;
+}
+html body .culms-exams-dashboard .culms-exams-dashboard__nav { gap: 2px !important; }
+html body .culms-exams-dashboard .culms-exams-dashboard__nav-btn {
+  width: 32px !important; height: 32px !important;
+  background: transparent !important; border: none !important;
+  color: var(--s-text-2) !important;
+  transition: background .2s var(--s-ease);
+}
+html body .culms-exams-dashboard .culms-exams-dashboard__nav-btn:hover:not(:disabled) { background: var(--s-hover) !important; color: var(--s-text) !important; }
+html body .culms-exams-dashboard .culms-exams-dashboard__nav-btn svg { width: 18px !important; height: 18px !important; }
+html body .culms-exams-dashboard .culms-exams-dashboard__note { margin: 0 !important; font-size: 13px !important; color: var(--s-text-3) !important; }
+
+/* дедлайны: календарная полоска, число — в бейдже */
+html body .culms-exams-dashboard .culms-deadlines { display: block !important; margin: 0 !important; }
+html body .culms-exams-dashboard .culms-deadlines__head { margin: 0 0 8px !important; }
+html body .culms-exams-dashboard .culms-deadlines__title {
+  font-size: 13px !important; line-height: 20px !important; font-weight: 500 !important; color: var(--s-text-2) !important;
+}
+html body .culms-exams-dashboard .culms-deadlines__legend { display: none !important; }
+html body .culms-exams-dashboard .culms-deadlines__days { gap: 2px !important; row-gap: 4px !important; }
+html body .culms-exams-dashboard .culms-deadlines__day {
+  gap: 4px !important;
+  padding: 6px 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  transition: background .2s var(--s-ease);
+}
+html body .culms-exams-dashboard .culms-deadlines__day:hover,
+html body .culms-exams-dashboard .culms-deadlines__day:focus-visible { background: var(--s-hover) !important; }
+html body .culms-exams-dashboard .culms-deadlines__when {
+  flex-direction: column !important; align-items: center !important; gap: 2px !important; overflow: visible !important;
+}
+html body .culms-exams-dashboard .culms-deadlines__weekday {
+  font-size: 11px !important; line-height: 14px !important; font-weight: 500 !important; color: var(--s-text-3) !important;
+}
+html body .culms-exams-dashboard .culms-deadlines__date {
+  display: grid !important; place-items: center !important;
+  width: 28px !important; height: 28px !important; border-radius: 50% !important;
+  font-size: 14px !important; line-height: 1 !important; font-weight: 500 !important;
+  color: var(--s-text) !important;
+}
+html body .culms-exams-dashboard .culms-deadlines__day--weekend .culms-deadlines__date { color: var(--s-text-3) !important; }
+html body .culms-exams-dashboard .culms-deadlines__day--today .culms-deadlines__date {
+  background: var(--s-primary) !important; color: var(--s-on-primary) !important;
+}
+html body .culms-exams-dashboard .culms-deadlines__day--today .culms-deadlines__weekday { color: var(--s-primary) !important; }
+html body .culms-exams-dashboard .culms-deadlines__count {
+  display: inline-flex !important; align-items: baseline !important;
+  min-height: 18px !important; padding: 0 6px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important; line-height: 18px !important; font-weight: 600 !important;
+  background: var(--culms-dl-bg, transparent) !important;
+  color: var(--culms-dl-fg, var(--s-text-3)) !important;
+  font-variant-numeric: tabular-nums;
+}
+html body .culms-exams-dashboard .culms-deadlines__count:empty { background: transparent !important; }
+html body .culms-exams-dashboard .culms-deadlines__total { font-size: 10px !important; opacity: .75 !important; }
+html body .culms-exams-dashboard .culms-deadlines__day--closed .culms-deadlines__count {
+  background: var(--s-surface-2) !important; color: var(--s-text-3) !important;
+}
+html body .culms-exams-dashboard .culms-deadlines__day--closed .culms-deadlines__count::before { content: "✓ "; }
+html body .culms-exams-dashboard .culms-deadlines__day--week-start::before { width: 1px !important; background: var(--s-line) !important; opacity: 1 !important; }
+/* уровни: сколько дедлайнов в день — тональные цвета M3 */
+html body .culms-exams-dashboard .culms-deadlines--l1 { --culms-dl-bg: #C4EED0; --culms-dl-fg: #0D652D; }
+html body .culms-exams-dashboard .culms-deadlines--l2 { --culms-dl-bg: #FFEFC2; --culms-dl-fg: #7A5900; }
+html body .culms-exams-dashboard .culms-deadlines--l3 { --culms-dl-bg: #FFDBCB; --culms-dl-fg: #8A3A00; }
+html body .culms-exams-dashboard .culms-deadlines--l4 { --culms-dl-bg: #F9DEDC; --culms-dl-fg: #B3261E; }
+:root:has(#culms-dark-theme-style-base) body .culms-exams-dashboard .culms-deadlines--l1 { --culms-dl-bg: rgba(109,213,140,.16); --culms-dl-fg: #6DD58C; }
+:root:has(#culms-dark-theme-style-base) body .culms-exams-dashboard .culms-deadlines--l2 { --culms-dl-bg: rgba(253,214,99,.16); --culms-dl-fg: #FDD663; }
+:root:has(#culms-dark-theme-style-base) body .culms-exams-dashboard .culms-deadlines--l3 { --culms-dl-bg: rgba(255,182,147,.18); --culms-dl-fg: #FFB693; }
+:root:has(#culms-dark-theme-style-base) body .culms-exams-dashboard .culms-deadlines--l4 { --culms-dl-bg: rgba(242,184,181,.18); --culms-dl-fg: #F2B8B5; }
+
+/* контрольные по неделям — лента, а не карточки */
+html body .culms-exams-dashboard .culms-exams-dashboard__weeks {
+  display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; margin: 0 !important;
+}
+html body .culms-exams-dashboard .culms-exams-week {
+  padding: 14px 0 16px !important;
+  background: none !important;
+  border: none !important;
+  border-top: 1px solid var(--s-line) !important;
+  border-radius: 0 !important;
+}
+html body .culms-exams-dashboard .culms-exams-week__head {
+  display: flex !important; flex-wrap: wrap !important; align-items: baseline !important;
+  justify-content: flex-start !important; gap: 4px 8px !important;
+}
+html body .culms-exams-dashboard .culms-exams-week__title {
+  font-size: 14px !important; line-height: 20px !important; font-weight: 600 !important; color: var(--s-text) !important;
+}
+html body .culms-exams-dashboard .culms-exams-week__dates {
+  display: inline !important; margin: 0 !important;
+  font-size: 12px !important; line-height: 20px !important; color: var(--s-text-3) !important;
+}
+html body .culms-exams-dashboard .culms-exams-week__badge {
+  margin-left: auto !important; align-self: center !important;
+  padding: 2px 8px !important; border: none !important; border-radius: 999px !important;
+  background: var(--s-tonal) !important; color: var(--s-on-tonal) !important;
+  font-size: 11px !important; line-height: 16px !important; font-weight: 600 !important;
+}
+html body .culms-exams-dashboard .culms-exams-week__empty {
+  margin: 6px 0 0 !important; font-size: 13px !important; line-height: 18px !important; color: var(--s-text-3) !important;
+}
+html body .culms-exams-dashboard .culms-exams-week__courses {
+  display: flex !important; flex-direction: column !important; gap: 12px !important;
+  margin: 12px 0 0 !important; padding: 0 !important;
+}
+html body .culms-exams-dashboard .culms-exams-week__course {
+  display: grid !important;
+  grid-template-columns: 8px minmax(0, 1fr) !important;
+  column-gap: 12px !important; row-gap: 1px !important;
+  align-items: center !important;
+  padding: 0 !important; margin: 0 !important;
+}
+html body .culms-exams-dashboard .culms-exams-week__course::before {
+  content: ""; grid-row: 1; grid-column: 1;
+  width: 8px; height: 8px; border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--s-primary);
+}
+html body .culms-exams-dashboard .culms-exams-week--current .culms-exams-week__course::before { background: var(--s-primary); }
+html body .culms-exams-dashboard .culms-exams-week__summary {
+  grid-column: 2 !important; grid-row: 1 !important;
+  font-size: 13.5px !important; line-height: 20px !important; font-weight: 600 !important;
+  color: var(--s-text) !important;
+  overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
+}
+html body .culms-exams-dashboard .culms-exams-dashboard__course-name {
+  grid-column: 2 !important; grid-row: 2 !important;
+  font-size: 13px !important; line-height: 18px !important; font-weight: 400 !important;
+  color: var(--s-text-2) !important; text-decoration: none !important;
+  overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
+}
+html body .culms-exams-dashboard .culms-exams-dashboard__course-name:hover { color: var(--s-primary) !important; }
+/* широкий дэшборд (узкое окно, он над курсами): недели в три колонки */
+@container (width >= 640px) {
+  html body .culms-exams-dashboard .culms-exams-dashboard__weeks { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; column-gap: 24px !important; }
+}
+/* всплывашка дня */
+html body #culms-deadlines-popover,
+html body .culms-deadlines-popover {
+  background: var(--s-surface) !important;
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-r-m) !important;
+  box-shadow: var(--s-shadow-2) !important;
+  padding: 12px 14px !important;
+  animation: s-pop .18s var(--s-ease-dec);
+}
+
+/* =========================================================
+   7. ПАНЕЛИ НА ОСТАЛЬНЫХ СТРАНИЦАХ
+   ========================================================= */
+cu-courses-group > section,
+cu-campaigns-list.new-lms-layout > section.campaign-card,
+section#culms-swap-menu,
+div.course-details,
+cu-course-progress-widget.progress-widget,
+cu-deadline-widget.deadline-widget,
+cu-navigation-widget.time-widget,
+cu-navigation-widget.support-widget,
+cu-navigation-widget.syllabus-widget,
+div.service-list > cu-self-service-dashboard-static-card > a.static-card-link > div.static-card,
+div#cu-clubs-container div.cu-event-card,
+cu-longread-material > cu-longread-material-exercise > cu-student-task > cu-student-task-preview,
+cu-longread-feedback.feedback,
+section.cu-task-section.cu-task-section__bordered,
+cu-student-task-tabs.cu-task-section.cu-task-section__bordered,
+cu-student-task-info-block.cu-task-section.cu-task-section__bordered,
+cu-longread-material-file > cu-uploaded-files-download > tui-files > a.file,
+html body section.main-card.main-card {
+  background: var(--s-surface) !important;
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-r-l) !important;
+  box-shadow: none !important;
+  color: var(--s-text);
+}
+section.header-island:not(cu-course-learning-layout section) {
+  background: var(--s-surface) !important;
+  border: 1px solid var(--s-line) !important;
+  border-radius: var(--s-r-xl) !important;
+  box-shadow: none !important;
+}
+section.header-island h1 { font-weight: 500 !important; }
+
+/* страница курса: заголовок и вкладки «Курс / Видеозаписи» с воздухом */
+html body cu-course-overview div.course-details {
+  padding: 28px 32px 20px !important;
+  border-radius: var(--s-r-xl) !important;
+}
+html body cu-course-overview h1.page-title {
+  margin: 0 0 16px !important;
+  font-size: 28px !important; line-height: 36px !important;
+  font-weight: 500 !important; letter-spacing: -.2px !important;
+  color: var(--s-text) !important;
+}
+html body cu-course-overview cu-tabs.navigation-tabs { margin: 0 0 12px !important; }
+html body cu-course-overview .tabs-container { gap: 8px !important; }
+html body cu-course-overview a.tab {
+  height: 36px !important; padding: 0 16px !important;
+  border-radius: var(--s-r-s) !important;
+  background: transparent !important;
+  box-shadow: inset 0 0 0 1px var(--s-line-2) !important;
+  color: var(--s-text-2) !important; font-weight: 500 !important;
+}
+html body cu-course-overview a.tab:hover { background: var(--s-hover) !important; }
+html body cu-course-overview a.tab.active { box-shadow: none !important; color: var(--s-on-tonal) !important; }
+html body cu-course-overview a.tab::before, html body cu-course-overview a.tab::after { display: none !important; }
+html body cu-course-content .themes-container { gap: 2px !important; margin: 0 -12px !important; }
+html body cu-course-content tui-accordion { border-radius: var(--s-r-m) !important; }
+
+/* вкладки на других страницах — те же чипы */
+a.tab {
+  border-radius: var(--s-r-s) !important;
+}
+a.tab.active {
+  background: var(--s-tonal) !important;
+  color: var(--s-on-tonal) !important;
+  box-shadow: none !important;
+}
+
+/* кнопки — пилюли */
+html body [tuibutton]:not(.cu-navtab__main-element):not(.navtab):not(.tab),
+html body [tuiiconbutton]:not(.cu-navtab__main-element) {
+  border-radius: 999px !important;
+}
+cu-campaigns-list.new-lms-layout a.campaign-action {
+  background: var(--s-primary) !important;
+  color: var(--s-on-primary) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* выпадашки и диалоги */
+html body tui-dropdown,
+html body tui-data-list,
+html body [tuidropdown] {
+  border-radius: var(--s-r-m) !important;
+}
+html body tui-dropdown {
+  background: var(--s-surface) !important;
+  border: 1px solid var(--s-line) !important;
+  box-shadow: var(--s-shadow-2) !important;
+}
+
+
+/* =========================================================
+   8. ТАБЛИЦЫ
+   ========================================================= */
+html body table:has(td[tuitd]),
+html body table.task-table {
+  background: var(--s-surface) !important;
+  border: 1px solid var(--s-line) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: var(--s-r-l) !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+html body th[tuith], html body td[tuitd],
+html body table.task-table th, html body table.task-table td {
+  background: transparent !important;
+  border-color: var(--s-line) !important;
+  font-variant-numeric: tabular-nums;
+}
+html body th[tuith],
+html body table.task-table thead th {
+  background: var(--s-surface-2) !important;
+  color: var(--s-text-2) !important;
+  font-weight: 500 !important;
+}
+html body tr[tuitr]:hover > td[tuitd],
+html body table.task-table tr.task-table__task:hover > td {
+  background: var(--s-hover) !important;
+}
+
+
+/* ведомости и другие таблицы LMS (table.cu-table) — воздух и ровная сетка */
+html body table.cu-table { font-variant-numeric: tabular-nums; }
+html body table.cu-table th[tuith],
+html body table.cu-table td[tuitd] { padding-left: 16px !important; padding-right: 16px !important; }
+html body table.cu-table tr > :first-child { padding-left: 20px !important; }
+html body table.cu-table tr > :last-child { padding-right: 20px !important; }
+html body table.cu-table td[tuitd] {
+  height: 52px !important;
+  border-top: none !important;
+  border-bottom: 1px solid var(--s-line) !important;
+  font-size: 14px !important;
+  color: var(--s-text) !important;
+}
+html body table.cu-table tbody tr:last-child > td[tuitd] { border-bottom: none !important; }
+html body table.cu-table th[tuith] {
+  height: 44px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  color: var(--s-text-2) !important;
+  border-bottom: 1px solid var(--s-line) !important;
+}
+html body table.cu-table td.name-cell { font-weight: 500 !important; }
+html body table.cu-table tr.course-row { cursor: pointer; transition: background .15s var(--s-ease); }
+html body table.cu-table [tuichip] {
+  border-radius: 999px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+html body cu-student-performance .top-bar { margin: 4px 0 12px !important; }
+html body tui-tabs._underline a[tuitab] { font-weight: 500 !important; color: var(--s-text-2) !important; }
+html body tui-tabs._underline a[tuitab]._active { color: var(--s-primary) !important; }
+
+
+/* =========================================================
+   9. УВЕДОМЛЕНИЯ — side sheet
+   ========================================================= */
+html body tui-drawer.sidebar:has(cu-notification-sidebar-header) aside.t-aside {
+  background: var(--s-surface) !important;
+  border: none !important;
+  border-radius: var(--s-r-xl) 0 0 var(--s-r-xl) !important;
+  box-shadow: var(--s-shadow-2) !important;
+}
+html body cu-notification-card div.notification { border-radius: var(--s-r-m) !important; }
+html body cu-notification-card div.notification:hover { background: var(--s-hover) !important; }
+
+
+/* =========================================================
+   10. ЛОГОТИП — надпись @mrknef моноширинным
+   ========================================================= */
+@font-face { font-family: 'Google Sans Code'; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url(https://fonts.gstatic.com/s/googlesanscode/v22/pxiSyogzv91QhV44Z_GQBHsGf5PuckJMZfIVTPZaiXEp_jF58LQ.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+2000-206F; }
+html body cu-navigation-link.header__logo-link a {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: auto !important;
+  gap: 2px !important;
+  text-decoration: none !important;
+}
+html body cu-navigation-link.header__logo-link a::before {
+  content: "@mrknef" !important;
+  display: block !important;
+  inline-size: auto !important; block-size: auto !important;
+  width: auto !important; height: auto !important;
+  margin: 0 !important; padding: 0 !important;
+  -webkit-mask: none !important; mask: none !important;
+  background: none !important; border: none !important; border-radius: 0 !important;
+  color: var(--s-text) !important;
+  opacity: 1 !important; filter: none !important; transform: none !important;
+  font-family: 'Google Sans Code', 'JetBrains Mono', ui-monospace, Consolas, monospace !important;
+  font-size: 16px !important; font-weight: 600 !important;
+  line-height: 24px !important; letter-spacing: -.3px !important;
+  white-space: pre !important;
+}
+/* мигающий курсор, как в терминале (::after у ссылки занят LMS) */
+html body cu-navigation-link.header__logo-link a::after { display: none !important; }
+html body cu-navigation-link.header__logo-link a::before {
+  padding-right: 7px !important;
+  background: linear-gradient(var(--s-primary), var(--s-primary)) right center / 2px 18px no-repeat !important;
+  animation: s-caret 1.1s steps(1) infinite;
+}
+
+
+/* =========================================================
+   11. АНИМАЦИИ — пружины и «размытие при появлении»,
+   как в Material 3 Expressive и iOS. Быстро, но мягко.
+   ========================================================= */
+@view-transition { navigation: auto; }
+
+@keyframes s-enter {
+  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+@keyframes s-rise {
+  from { opacity: 0; transform: translateY(14px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes s-row { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+@keyframes s-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes s-pop { from { opacity: 0; transform: scale(.94) translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes s-indicator { from { background-size: 30% 100%; } to { background-size: 100% 100%; } }
+@keyframes s-caret { 50% { background-size: 0 18px; } }
+
+/* смена страницы: новый экран проявляется из лёгкого размытия */
+html body main.main router-outlet + :not(cu-courses-group) {
+  animation: s-enter .42s var(--s-ease-dec) both;
+}
+
+/* --- «перетекающая» таблетка выбранного пункта (CSS anchor positioning) ---
+   Подложка — один псевдоэлемент списка; он привязан к активному пункту
+   и пружиной переезжает к новому, когда меняется страница. */
+@supports (anchor-name: --a) {
+  /* rail: одна подложка на весь список, едет к активному пункту.
+     Позиция считается по номеру пункта (шаг 64px), поэтому переезд
+     анимируется всегда, даже если LMS на кадр снимает выделение. */
+  html body cu-sidebar.collapsed div.static-content ul.nav-list { position: relative !important; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list > li a.cu-navtab__main-element { position: relative; z-index: 1; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list > li > cu-navtab > a.cu-navtab__main-element.cu-navtab__main-element_active {
+    background: transparent !important;
+    animation: none !important;
+  }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list::before {
+    content: "";
+    position: absolute;
+    top: 4px; left: 50%;
+    width: 56px; height: 32px;
+    translate: -50% 0;
+    border-radius: 16px;
+    background: var(--s-tonal);
+    opacity: 0;
+    z-index: 0;
+    pointer-events: none;
+    transition: translate .55s var(--s-spring), opacity .2s, background-color .3s;
+  }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(1) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 0px; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(2) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 64px; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(3) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 128px; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(4) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 192px; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(5) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 256px; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(6) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 320px; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(7) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 384px; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(8) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 448px; }
+  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(9) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 512px; }
+
+  /* то же для чипов-фильтров и вкладок курса (Все / Обязательные…, Курс / Видеозаписи) */
+  html body .tabs-container:has(> a.tab) { position: relative !important; }
+  html body .tabs-container > a.tab { position: relative; z-index: 1; }
+  html body :is(section.header-island, cu-course-overview) .tabs-container > a.tab.active {
+    anchor-name: --s-chip;
+    background: transparent !important;
+    animation: none !important;
+  }
+  html body .tabs-container:has(> a.tab.active)::before {
+    content: "";
+    position: absolute;
+    position-anchor: --s-chip;
+    top: anchor(top); left: anchor(left);
+    width: anchor-size(width); height: anchor-size(height);
+    border-radius: var(--s-r-s);
+    background: var(--s-tonal);
+    z-index: 0;
+    pointer-events: none;
+    transition: left .5s var(--s-spring), width .5s var(--s-spring);
+  }
+}
+/* шапка — индикатор раскрывается от центра */
+html body a.header__tab-link.header__tab-link_active { animation: s-indicator .45s var(--s-ease-dec); }
+
+/* карточки курсов — лесенкой, с пружиной */
+html body ul.course-list > li.course-list__item { animation: s-rise .6s var(--s-spring-soft) both; }
+html body ul.course-list > li.course-list__item:nth-child(2)  { animation-delay: 30ms; }
+html body ul.course-list > li.course-list__item:nth-child(3)  { animation-delay: 60ms; }
+html body ul.course-list > li.course-list__item:nth-child(4)  { animation-delay: 90ms; }
+html body ul.course-list > li.course-list__item:nth-child(5)  { animation-delay: 120ms; }
+html body ul.course-list > li.course-list__item:nth-child(6)  { animation-delay: 150ms; }
+html body ul.course-list > li.course-list__item:nth-child(7)  { animation-delay: 180ms; }
+html body ul.course-list > li.course-list__item:nth-child(8)  { animation-delay: 210ms; }
+html body ul.course-list > li.course-list__item:nth-child(n+9) { animation-delay: 240ms; }
+
+/* темы курса, строки ведомостей и списки — въезжают по очереди */
+html body cu-course-content .themes-container > *,
+html body table.cu-table tbody tr,
+html body .culms-exams-week__course { animation: s-row .4s var(--s-ease-dec) both; }
+html body cu-course-content .themes-container > :nth-child(2), html body table.cu-table tbody tr:nth-child(2) { animation-delay: 25ms; }
+html body cu-course-content .themes-container > :nth-child(3), html body table.cu-table tbody tr:nth-child(3) { animation-delay: 50ms; }
+html body cu-course-content .themes-container > :nth-child(4), html body table.cu-table tbody tr:nth-child(4) { animation-delay: 75ms; }
+html body cu-course-content .themes-container > :nth-child(5), html body table.cu-table tbody tr:nth-child(5) { animation-delay: 100ms; }
+html body cu-course-content .themes-container > :nth-child(6), html body table.cu-table tbody tr:nth-child(6) { animation-delay: 125ms; }
+html body cu-course-content .themes-container > :nth-child(7), html body table.cu-table tbody tr:nth-child(7) { animation-delay: 150ms; }
+html body cu-course-content .themes-container > :nth-child(n+8), html body table.cu-table tbody tr:nth-child(n+8) { animation-delay: 175ms; }
+
+html body .culms-exams-dashboard { animation: s-enter .5s .12s var(--s-ease-dec) both; }
+html body cu-widgets-panel > section > * { animation: s-rise .55s var(--s-spring-soft) both; }
+html body cu-widgets-panel > section > :nth-child(2) { animation-delay: 60ms; }
+html body cu-widgets-panel > section > :nth-child(3) { animation-delay: 120ms; }
+
+/* отклик на нажатие — лёгкое «вдавливание» (свойство scale не спорит с transform) */
+html body :is([tuibutton], [tuiiconbutton], a.tab, a.header__tab-link, a.cu-navtab__main-element, .culms-deadlines__day, li.course-list__item cu-course-card) {
+  transition: scale .25s var(--s-spring), background-color .2s var(--s-ease), color .2s var(--s-ease), box-shadow .25s var(--s-ease), transform .3s var(--s-spring) !important;
+}
+html body :is([tuibutton], [tuiiconbutton], a.tab, a.header__tab-link, a.cu-navtab__main-element, .culms-deadlines__day):active { scale: .95; }
+html body li.course-list__item cu-course-card:active { scale: .97; }
+
+/* выпадашки, подсказки и диалоги */
+html body tui-dropdown, html body tui-hint, html body tui-dialog > .t-content { animation: s-pop .22s var(--s-spring) both; }
+
+/* плавная смена светлой/тёмной темы */
+html body :is(header.header, cu-sidebar, div.static-content, main.main, section.header-island, .culms-exams-dashboard, div.course-details, table.cu-table) {
+  transition: background-color .35s var(--s-ease), color .35s var(--s-ease), border-color .35s var(--s-ease);
+}
+
+/* кому мешает движение — без анимаций */
+@media (prefers-reduced-motion: reduce) {
+  html body *, html body *::before, html body *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
