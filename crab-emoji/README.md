@@ -1,14 +1,15 @@
 # Крабик — анимированный пак
 
-10 зацикленных пиксельных анимаций без фона.
+15 зацикленных пиксельных анимаций без фона.
 
 | | | | | |
 |:-:|:-:|:-:|:-:|:-:|
 | ![](gif/hello.gif) hello | ![](gif/happy.gif) happy | ![](gif/heart.gif) heart | ![](gif/cry.gif) cry | ![](gif/angry.gif) angry |
 | ![](gif/scared.gif) scared | ![](gif/tea.gif) tea | ![](gif/laptop.gif) laptop | ![](gif/watch-code.gif) watch-code | ![](gif/rage-laptop.gif) rage-laptop |
+| ![](gif/typing.gif) typing | ![](gif/deadline.gif) deadline | ![](gif/bang.gif) bang | ![](gif/walk.gif) walk | ![](gif/walk-santa.gif) walk-santa |
 
 - `gif/` — 480×480, прозрачный фон
-- `emoji/` — 100×100 WEBM (VP9 с альфой) для кастомных эмодзи Telegram
+- `emoji/` — 100×100 WEBM (VP9 с альфой) для кастомных эмодзи Telegram, пиксели ровно ×3 — без мыла
 - `stickers/` — 512×512 WEBM для видеостикеров Telegram
 
 Все файлы ≤ 3 с и 12.5 fps — в лимитах Telegram.
@@ -32,4 +33,5 @@ pip install pillow   # и ffmpeg с libvpx-vp9
 python3 make_crabs.py
 ```
 
-Каждая анимация — функция `anim_*` в `make_crabs.py`, кадры рисуются прямоугольниками на сетке 40×40.
+Каждая анимация — функция `anim_*` в `make_crabs.py`, кадры рисуются прямоугольниками на сетке 40×40,
+в файл попадает окно 32×32 вокруг крабика (одинаковое для всех анимаций).

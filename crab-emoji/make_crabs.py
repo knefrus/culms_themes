@@ -1,10 +1,12 @@
 """Пиксельный крабик: пак зацикленных анимаций.
 
-Рисуем на логической сетке 40×40 (1 «пиксель» краба из оригинала = 2 клетки),
-потом масштабируем без сглаживания:
-  gif/      — 480×480, прозрачный фон
-  emoji/    — 100×100 VP9 WEBM с альфой (кастомные эмодзи Telegram)
-  stickers/ — 512×512 VP9 WEBM с альфой (видеостикеры Telegram)
+Рисуем на логической сетке 40×40 (1 «пиксель» краба из оригинала = 2 клетки).
+Из каждой анимации вырезается окно 32×32 вокруг содержимого (крабик во всех
+анимациях одного размера и стоит на одной линии), потом оно масштабируется
+без сглаживания — пиксели остаются чёткими:
+  gif/      — 480×480 (×15), прозрачный фон
+  emoji/    — 100×100 (×3 = 96 + поля по 2 px) VP9 WEBM с альфой — кастомные эмодзи Telegram
+  stickers/ — 512×512 (×16) VP9 WEBM с альфой — видеостикеры Telegram
 Все анимации ≤ 3 с и 12.5 fps — в лимитах Telegram.
 
 Запуск: python3 make_crabs.py [out_dir] [имя ...]   (по умолчанию out_dir = текущая папка)
@@ -21,6 +23,8 @@ from PIL import Image, ImageDraw
 W = 40                 # логический холст
 FRAME_MS = 80          # 12.5 fps — темп как у оригинала
 GROUND = 36            # низ ножек
+VIEW = 32              # сторона окна, которое попадает в файл
+VIEW_BOTTOM = GROUND + 2
 
 BODY = (216, 112, 80, 255)
 SHADE = (184, 104, 72, 255)
@@ -42,6 +46,13 @@ PLAID = (98, 112, 196, 255)
 PLAID_D = (72, 84, 160, 255)
 PLAID_L = (150, 162, 226, 255)
 STAR = (255, 205, 80, 255)
+SANTA = (214, 40, 48, 255)
+SANTA_D = (170, 26, 36, 255)
+FUR = (246, 246, 246, 255)
+FUR_D = (214, 214, 220, 255)
+TOY = (84, 190, 112, 255)
+TOY_D = (52, 142, 80, 255)
+TIP = (255, 140, 40, 255)
 
 
 class F:
@@ -49,6 +60,7 @@ class F:
 
     def __init__(self):
         self.ops = []
+        self.sprites = []   # (картинка, x, y) — рисуются под прямоугольниками
 
     def r(self, x0, y0, x1, y1, c):
         self.ops.append((x0, y0, x1, y1, c))
@@ -58,6 +70,8 @@ class F:
 
     def img(self, dx=0):
         im = Image.new('RGBA', (W, W), (0, 0, 0, 0))
+        for sp, x, y in self.sprites:
+            im.alpha_composite(sp, (x + dx, y)) if x + dx >= 0 and y >= 0 else im.paste(sp, (x + dx, y), sp)
         d = ImageDraw.Draw(im)
         for x0, y0, x1, y1, c in self.ops:
             if x1 > x0 and y1 > y0:
@@ -142,6 +156,10 @@ def draw_eyes(f, bx, by, kind, look=(0, 0)):
     elif kind == 'cry':    # зажмурился
         for x in (lx - 1, rx - 1):
             f.px(x, ly, EYE); f.px(x + 1, ly + 1, EYE); f.px(x + 2, ly, EYE)
+    elif kind == 'dead':   # ×  ×
+        for x in (lx - 1, rx - 1):
+            f.px(x, ly - 1, EYE); f.px(x + 2, ly - 1, EYE); f.px(x + 1, ly, EYE)
+            f.px(x, ly + 1, EYE); f.px(x + 2, ly + 1, EYE)
     elif kind == 'shut':
         f.r(lx - 1, ly + 1, lx + 3, ly + 2, EYE); f.r(rx - 1, ly + 1, rx + 3, ly + 2, EYE)
 
@@ -154,12 +172,12 @@ def blush(f, c):
 # ---------------------------------------------------------------- предметы
 def laptop_side(f, x, open_=True, y=GROUND):
     """Ноутбук в профиль, как в оригинале: основание + наклонённый экран, шарнир справа."""
-    f.r(x, y - 1, x + 11, y, GRAY)
+    f.r(x, y - 1, x + 10, y, GRAY)
     if open_:
-        for i in range(5):
-            f.r(x + 10 + i, y - 3 - 2 * i, x + 11 + i, y - 1 - 2 * i, GRAY)
+        for i in range(4):
+            f.r(x + 9 + i, y - 3 - 2 * i, x + 10 + i, y - 1 - 2 * i, GRAY)
     else:
-        f.r(x, y - 2, x + 11, y - 1, GRAY_D)
+        f.r(x, y - 2, x + 10, y - 1, GRAY_D)
 
 
 def laptop_flat(f, cx, y, crushed=0):
@@ -259,8 +277,8 @@ def anim_happy():
             arms = ('high', 'high') if lift >= 3 else (('out', 'out') if sq == 0 else ('down', 'down'))
             c = crab(f, lift=lift, squash=sq, stretch=st, legs=legs, arms=arms, eyes='happy')
             if lift >= 7:
-                sparkle(f, 4, 8 - (i % 2), i % 2)
-                sparkle(f, 35, 6 + (i % 2), (i + 1) % 2)
+                sparkle(f, 6, 11 - (i % 2), i % 2)
+                sparkle(f, 34, 9 + (i % 2), (i + 1) % 2)
             frames.append(f)
     return frames
 
@@ -293,10 +311,10 @@ def anim_heart():
         else:
             heart(f, cx - 3, c['by'] + 5)
         # маленькие сердечки улетают вверх
-        for k, (sx, ph) in enumerate(((3, 0), (34, 12), (7, 24))):
+        for k, (sx, ph) in enumerate(((6, 0), (31, 12), (9, 24))):
             t = (i - ph) % 36
-            if t < 18:
-                small_heart(f, sx + (1 if (t // 3) % 2 else 0), 22 - t, PINK if t > 12 else RED)
+            if t < 15:
+                small_heart(f, sx + (1 if (t // 3) % 2 else 0), 22 - t, PINK if t > 10 else RED)
         frames.append(f)
     return frames
 
@@ -340,8 +358,8 @@ def anim_angry():
             if t < 8:
                 puff(f, px_ + (k * 2 - 1) * (t // 3), by - 3 - t, min(t // 3, 2))
         if stomp == 4:  # пыль от удара
-            f.r(4, GROUND - 1, 7, GROUND, STEAM); f.r(33, GROUND - 1, 36, GROUND, STEAM)
-            f.px(2, GROUND - 3, STEAM); f.px(37, GROUND - 3, STEAM)
+            f.r(6, GROUND - 1, 9, GROUND, STEAM); f.r(31, GROUND - 1, 34, GROUND, STEAM)
+            f.px(5, GROUND - 3, STEAM); f.px(34, GROUND - 3, STEAM)
         frames.append(f)
     return frames
 
@@ -432,13 +450,13 @@ def anim_laptop():
         if 24 <= i < 28:
             eyes = 'happy'
         c = crab(f, cx=14, arms=('out', 'type2' if tap else 'type'), eyes=eyes, look=(1, 0), shade='left')
-        laptop_side(f, 25)
+        laptop_side(f, 21)
         # «код» вылетает из экрана
         for k in range(3):
             t = (i * 2 + k * 5) % 15
             if t < 12:
                 col = (GRAY_L, STAR, BLUE)[k]
-                f.r(34 + k * 2, 22 - t, 35 + k * 2, 23 - t, col)
+                f.r(28 + k * 2, 24 - t, 29 + k * 2, 25 - t, col)
         frames.append(f)
     return frames
 
@@ -466,10 +484,10 @@ def anim_watch():
             for k in range(2):
                 t = (ph * 2 + k * 6) % 12
                 if t < 9:
-                    f.r(35 + k * 2, 22 - t, 36 + k * 2, 23 - t, (GRAY_L, BLUE)[k])
+                    f.r(29 + k * 2, 24 - t, 30 + k * 2, 25 - t, (GRAY_L, BLUE)[k])
             if ph >= 13:  # пот — торопится
                 f.r(c['bx'] - 1, c['by'] + (ph - 13), c['bx'], c['by'] + 2 + (ph - 13), BLUE_L)
-        laptop_side(f, 25)
+        laptop_side(f, 21)
         frames.append(f)
     return frames
 
@@ -503,7 +521,7 @@ def anim_rage_laptop():
                      eyes='angry', color=ANGRY if j in (4, 5) else BODY)
             laptop_flat(f, 20, GROUND, crushed=crushed if j >= 5 or k >= 7 else max(0, crushed - 1))
             if j == 5:   # искры
-                for sx, sy in ((3, 33), (36, 32), (6, 29), (34, 28)):
+                for sx, sy in ((6, 34), (34, 33), (8, 30), (32, 29)):
                     sparkle(f, sx, sy, 1, STAR)
         else:
             k = i - 28
@@ -521,6 +539,159 @@ def anim_rage_laptop():
     return frames
 
 
+def anim_typing():
+    """Над головой облачко с тремя прыгающими точками — «печатает…»."""
+    frames = []
+    for i in range(24):
+        f = F()
+        c = crab(f, squash=1 if i % 12 in (6, 7) else 0, eyes='blink' if i in (16, 17) else 'open',
+                 look=(1, -1) if i < 16 else (0, 0), arms=('out', 'up' if i % 12 < 6 else 'out'))
+        x, y = c['cx'] - 2, c['by'] - 11 + (1 if i % 12 in (6, 7) else 0)
+        # облачко 14×8 с хвостиком
+        f.r(x + 1, y, x + 13, y + 8, GRAY_L)
+        f.r(x, y + 1, x + 14, y + 7, GRAY_L)
+        f.r(x + 1, y + 1, x + 13, y + 7, WHITE)
+        f.r(x + 2, y + 8, x + 4, y + 9, GRAY_L); f.r(x + 1, y + 9, x + 2, y + 10, GRAY_L)
+        f.r(x + 2, y + 7, x + 4, y + 8, WHITE)
+        for k in range(3):   # точки по очереди подпрыгивают и темнеют
+            ph = (i // 2 - k) % 6
+            up = 1 if ph == 0 else 0
+            f.r(x + 3 + k * 3, y + 3 - up, x + 5 + k * 3, y + 5 - up, GRAY_D if ph in (0, 1) else GRAY)
+        frames.append(f)
+    return frames
+
+
+def anim_deadline():
+    """Как watch-code, только без часов: замирает, красный «!» и пот — и снова печатает."""
+    frames = []
+    for i in range(36):
+        f = F()
+        ph = i % 18
+        if ph < 7:
+            shake = (0, 1, 0, 1, 0, 1, 0)[ph]
+            c = crab(f, cx=14 + shake, arms=('out', 'up' if 1 <= ph <= 5 else 'out'),
+                     eyes='wide' if 1 <= ph <= 5 else 'open', shade='left')
+            if 1 <= ph <= 5:
+                ex = c['cx'] - 1
+                f.r(ex, c['by'] - 9, ex + 2, c['by'] - 4, RED)
+                f.r(ex, c['by'] - 3, ex + 2, c['by'] - 1, RED)
+                for k, (sx, side) in enumerate(((c['bx'] - 1, -1), (c['bx'] + 16, 1))):
+                    t = (ph + k) % 4
+                    f.r(sx + side * (t // 2), c['by'] + t, sx + side * (t // 2) + 1, c['by'] + 2 + t, BLUE_L)
+        else:
+            tap = ph % 2
+            c = crab(f, cx=14, arms=('out', 'type2' if tap else 'type'), eyes='blink' if ph == 12 else 'open',
+                     look=(1, 1), shade='left')
+            for k in range(2):
+                t = (ph * 2 + k * 6) % 12
+                if t < 9:
+                    f.r(29 + k * 2, 24 - t, 30 + k * 2, 25 - t, (GRAY_L, BLUE)[k])
+            if ph >= 13:
+                f.r(c['bx'] - 1, c['by'] + (ph - 13), c['bx'], c['by'] + 2 + (ph - 13), BLUE_L)
+        laptop_side(f, 21)
+        frames.append(f)
+    return frames
+
+
+def toy_gun(f, x, y):
+    """Игрушечный пистолетик дулом влево; (x, y) — левый верх ствола."""
+    f.r(x, y, x + 6, y + 2, TOY)
+    f.r(x, y, x + 1, y + 2, TIP)
+    f.r(x + 4, y + 2, x + 6, y + 5, TOY_D)
+    f.px(x + 3, y + 2, TOY_D)
+
+
+def crab_sprite(**kw):
+    """Краб отдельной картинкой (для поворота) + смещение его левого верхнего угла."""
+    g = F()
+    crab(g, **kw)
+    im = g.img()
+    b = im.getbbox()
+    return im.crop(b), b
+
+
+def anim_bang():
+    """Приставляет игрушечный пистолетик, «бах» — падает на спинку, лежит, вскакивает."""
+    frames = []
+    for i in range(36):
+        f = F()
+        if i < 4:
+            crab(f, eyes='blink' if i == 2 else 'open')
+        elif i < 12:
+            jit = (0, 0, 1, -1, 1, -1, 1, -1)[i - 4] if i >= 6 else 0
+            c = crab(f, cx=20 + jit, arms=('out', 'up'), eyes='open' if i < 6 else 'shut', look=(1, 0) if i < 6 else (0, 0))
+            toy_gun(f, c['bx'] + 15, c['by'] + 1)
+            if i >= 8:   # пот
+                f.r(c['bx'] - 1, c['by'] + (i - 8), c['bx'], c['by'] + 2 + (i - 8), BLUE_L)
+        elif i < 14:
+            c = crab(f, squash=2 if i == 12 else 1, arms=('out', 'up'), eyes='dead')
+            toy_gun(f, c['bx'] + 15, c['by'] + 1)
+            bx, by = c['bx'] + 15, c['by'] + 2
+            r = 3 if i == 12 else 4
+            for dx, dy in ((0, -r), (0, r), (-r, 0), (r, 0), (-r + 1, -r + 1), (r - 1, r - 1), (r - 1, -r + 1), (-r + 1, r - 1)):
+                f.px(bx + dx, by + dy, STAR)
+            f.r(bx - 1, by - 1, bx + 2, by + 2, WHITE if i == 12 else STAR)
+        elif i < 32:
+            k = i - 14
+            # пистолетик падает и лежит справа
+            gy = min(GROUND - 2, 21 + k * 4)
+            f.r(29, gy, 35, gy + 2, TOY); f.r(29, gy, 30, gy + 2, TIP); f.r(33, gy - 1 if gy < GROUND - 2 else gy, 35, gy, TOY_D)
+            angle = (90, 90, 180, 180)[k] if k < 4 else 180   # только по 90° — пиксели не рвутся
+            lift = (3, 5, 2, 0)[k] if k < 4 else 0
+            sp, b = crab_sprite(eyes='dead', arms=('out', 'out'), legs='walk', step=(k // 2) % 2)
+            rot = sp.rotate(angle, resample=Image.NEAREST, expand=True)
+            x = 20 - rot.width // 2 - (k if k < 4 else 4)
+            y = GROUND - rot.height - lift
+            f.sprites.append((rot, x, y))
+            if k >= 5 and (k // 3) % 2:   # звёздочки над «телом»
+                sparkle(f, 12 + (k % 3) * 4, 21 - (k % 2), 0, STAR)
+        else:
+            k = i - 32
+            angle = (180, 90, 0, 0)[k]
+            sp, b = crab_sprite(eyes='happy', arms=('high', 'high') if k == 2 else ('out', 'out'),
+                                squash=2 if k == 3 else 0)
+            rot = sp.rotate(angle, resample=Image.NEAREST, expand=True)
+            lift = (0, 5, 3, 0)[k]
+            x = 20 - rot.width // 2 - (4 - k)
+            f.sprites.append((rot, x, GROUND - rot.height - lift))
+        frames.append(f)
+    return frames
+
+
+WALK = [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 3, 3, 2, 2, 1, 1, 0, -1, -1, -2, -2, -3, -3, -4, -4, -4, -3, -3, -2, -2, -1, -1]
+
+
+def santa_hat(f, c, lean, bounce):
+    bx, by = c['bx'], c['by']
+    rows = [(3, 13), (4, 12), (5, 11), (6, 10), (7, 9)]
+    for k, (a, b) in enumerate(rows):
+        sh = round(lean * (k + 1) / 3)
+        f.r(bx + a + sh, by - 3 - k, bx + b + sh, by - 2 - k, SANTA if k < 4 else SANTA_D)
+    tip = bx + 8 + round(lean * 6 / 3)
+    f.r(tip - 1, by - 10 - bounce, tip + 1, by - 8 - bounce, FUR)
+    f.px(tip, by - 9 - bounce, FUR_D)
+    f.r(bx + 1, by - 2, bx + 15, by, FUR)
+    f.r(bx + 1, by - 1, bx + 15, by, FUR_D)
+
+
+def anim_walk(hat=False):
+    frames = []
+    for i in range(32):
+        f = F()
+        dx = WALK[i]
+        prev = WALK[i - 1]
+        d = 1 if dx > prev else (-1 if dx < prev else (1 if i < 16 else -1))
+        moving = dx != prev
+        bob = 1 if moving and i % 2 else 0
+        c = crab(f, cx=20 + dx, squash=bob, legs='walk' if moving else 'stand', step=i // 2,
+                 look=(d, 0), eyes='blink' if i in (9, 25) else 'open',
+                 arms=('out', 'out') if moving else ('down', 'down'))
+        if hat:
+            santa_hat(f, c, lean=-d * (2 if moving else 1), bounce=bob)
+        frames.append(f)
+    return frames
+
+
 ANIMS = {
     'happy': anim_happy,
     'hello': anim_hello,
@@ -532,20 +703,37 @@ ANIMS = {
     'laptop': anim_laptop,
     'watch-code': anim_watch,
     'rage-laptop': anim_rage_laptop,
+    'typing': anim_typing,
+    'deadline': anim_deadline,
+    'bang': anim_bang,
+    'walk': anim_walk,
+    'walk-santa': lambda: anim_walk(hat=True),
 }
 
 
 # ---------------------------------------------------------------- вывод
+def view_box(frames):
+    """Окно VIEW×VIEW: низ на одной линии для всех анимаций, по x — по центру содержимого."""
+    x0 = y0 = W
+    x1 = y1 = 0
+    for fr in frames:
+        b = fr.img().getbbox()
+        if b:
+            x0, y0, x1, y1 = min(x0, b[0]), min(y0, b[1]), max(x1, b[2]), max(y1, b[3])
+    top = VIEW_BOTTOM - VIEW
+    left = max(0, min(W - VIEW, round((x0 + x1) / 2 - VIEW / 2)))
+    assert left <= x0 and x1 <= left + VIEW and top <= y0 and y1 <= VIEW_BOTTOM, (x0, y0, x1, y1, left, top)
+    return (left, top, left + VIEW, VIEW_BOTTOM)
+
+
 def render(frames, scale, size=None):
+    box = view_box(frames)
     out = []
     for fr in frames:
-        im = fr.img().resize((W * scale, W * scale), Image.NEAREST)
-        if size and size < W * scale:   # эмодзи: крупно рисуем и аккуратно уменьшаем
-            out.append(im.resize((size, size), Image.LANCZOS))
-            continue
-        if size and size != W * scale:
+        im = fr.img().crop(box).resize((VIEW * scale, VIEW * scale), Image.NEAREST)
+        if size and size != VIEW * scale:
             canvas = Image.new('RGBA', (size, size), (0, 0, 0, 0))
-            o = (size - W * scale) // 2
+            o = (size - VIEW * scale) // 2
             canvas.paste(im, (o, o))
             im = canvas
         out.append(im)
@@ -553,7 +741,7 @@ def render(frames, scale, size=None):
 
 
 def save_gif(frames, path):
-    ims = render(frames, 12)
+    ims = render(frames, 15)
     conv = ims
     conv[0].save(path, save_all=True, append_images=conv[1:], duration=FRAME_MS, loop=0,
                  disposal=2, transparency=0, optimize=False)
@@ -578,8 +766,8 @@ def main():
         frames = ANIMS[name]()
         assert len(frames) * FRAME_MS <= 3000, (name, len(frames))
         save_gif(frames, os.path.join(out, 'gif', f'{name}.gif'))
-        save_webm(frames, os.path.join(out, 'emoji', f'{name}.webm'), 10, 100, 30)
-        save_webm(frames, os.path.join(out, 'stickers', f'{name}.webm'), 12, 512, 30)
+        save_webm(frames, os.path.join(out, 'emoji', f'{name}.webm'), 3, 100, 15)
+        save_webm(frames, os.path.join(out, 'stickers', f'{name}.webm'), 16, 512, 15)
         print(name, len(frames), 'frames')
 
 
