@@ -440,7 +440,6 @@ html body cu-sidebar.collapsed div.static-content a.cu-navtab__main-element::aft
   letter-spacing: -.1px !important;
   color: var(--s-text-2) !important;
   white-space: normal !important;
-  pointer-events: none;
 }
 html body cu-sidebar.collapsed div.static-content a.cu-navtab__main-element:hover:not(.cu-navtab__main-element_active) {
   background: var(--s-hover) !important;
@@ -1014,7 +1013,26 @@ html body tui-dropdown {
   background: var(--s-surface) !important;
   border: 1px solid var(--s-line) !important;
   box-shadow: var(--s-shadow-2) !important;
+  color: var(--s-text) !important;
+  font-family: var(--s-font) !important;
 }
+/* пункты меню (профиль, «Ещё» в шапке, фильтры) — строки-пилюли, как в M3 */
+html body tui-dropdown tui-data-list { padding: 6px !important; gap: 2px !important; }
+html body tui-dropdown [tuiOption] {
+  min-height: 40px !important;
+  padding: 0 12px !important;
+  border-radius: var(--s-r-s) !important;
+  display: flex !important; align-items: center !important; justify-content: flex-start !important; text-align: start !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--s-text) !important;
+  font: 500 14px/20px var(--s-font) !important;
+  transition: background-color .15s var(--s-ease) !important;
+}
+html body tui-dropdown [tuiOption]:is(:hover, :focus-visible, [data-mode~=checked], ._with-dropdown:focus) { background: var(--s-hover) !important; }
+html body tui-dropdown [tuiOption]:active { background: var(--s-tonal) !important; color: var(--s-on-tonal) !important; }
+html body tui-dropdown hr { border-color: var(--s-line) !important; background: var(--s-line) !important; }
+html body .user-profile-menu__content { padding: 8px !important; min-width: 260px !important; }
 
 
 /* =========================================================
@@ -1133,14 +1151,16 @@ html body cu-navigation-link.header__logo-link a::before {
 
 
 /* =========================================================
-   11. АНИМАЦИИ — пружины и «размытие при появлении»,
-   как в Material 3 Expressive и iOS. Быстро, но мягко.
+   11. АНИМАЦИИ — пружины, как в Material 3 Expressive и iOS.
+   Быстро, но мягко. Анимируем только opacity и transform (их считает
+   видеокарта), а fill-mode — backwards: закончившаяся анимация
+   не висит на элементе.
    ========================================================= */
 @view-transition { navigation: auto; }
 
 @keyframes s-enter {
-  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
-  to   { opacity: 1; transform: none; filter: none; }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
 }
 @keyframes s-rise {
   from { opacity: 0; transform: translateY(14px) scale(.96); }
@@ -1152,48 +1172,49 @@ html body cu-navigation-link.header__logo-link a::before {
 @keyframes s-indicator { from { background-size: 30% 100%; } to { background-size: 100% 100%; } }
 @keyframes s-caret { 50% { background-size: 0 18px; } }
 
-/* смена страницы: новый экран проявляется из лёгкого размытия */
+/* смена страницы: новый экран мягко всплывает (без blur — он перерисовывает весь экран каждый кадр) */
 html body main.main router-outlet + :not(cu-courses-group) {
-  animation: s-enter .42s var(--s-ease-dec) both;
+  animation: s-enter .36s var(--s-ease-dec) backwards;
 }
 
-/* --- «перетекающая» таблетка выбранного пункта (CSS anchor positioning) ---
-   Подложка — один псевдоэлемент списка; он привязан к активному пункту
-   и пружиной переезжает к новому, когда меняется страница. */
-@supports (anchor-name: --a) {
-  /* rail: одна подложка на весь список, едет к активному пункту.
-     Позиция считается по номеру пункта (шаг 64px), поэтому переезд
-     анимируется всегда, даже если LMS на кадр снимает выделение. */
-  html body cu-sidebar.collapsed div.static-content ul.nav-list { position: relative !important; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list > li a.cu-navtab__main-element { position: relative; z-index: 1; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list > li > cu-navtab > a.cu-navtab__main-element.cu-navtab__main-element_active {
-    background: transparent !important;
-    animation: none !important;
-  }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list::before {
-    content: "";
-    position: absolute;
-    top: 4px; left: 50%;
-    width: 56px; height: 32px;
-    translate: -50% 0;
-    border-radius: 16px;
-    background: var(--s-tonal);
-    opacity: 0;
-    z-index: 0;
-    pointer-events: none;
-    transition: translate .55s var(--s-spring), opacity .2s, background-color .3s;
-  }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(1) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 0px; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(2) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 64px; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(3) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 128px; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(4) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 192px; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(5) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 256px; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(6) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 320px; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(7) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 384px; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(8) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 448px; }
-  html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(9) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 512px; }
+/* --- «перетекающая» таблетка выбранного пункта ---
+   rail: одна подложка на весь список, едет к активному пункту.
+   Позиция считается по номеру пункта (шаг 64px), поэтому переезд
+   анимируется всегда, даже если LMS на кадр снимает выделение.
+   Anchor positioning тут не нужен — работает и в Firefox. */
+html body cu-sidebar.collapsed div.static-content ul.nav-list { position: relative !important; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list > li a.cu-navtab__main-element { position: relative; z-index: 1; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list > li > cu-navtab > a.cu-navtab__main-element.cu-navtab__main-element_active {
+  background: transparent !important;
+  animation: none !important;
+}
+html body cu-sidebar.collapsed div.static-content ul.nav-list::before {
+  content: "";
+  position: absolute;
+  top: 4px; left: 50%;
+  width: 56px; height: 32px;
+  translate: -50% 0;
+  border-radius: 16px;
+  background: var(--s-tonal);
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: translate .55s var(--s-spring), opacity .2s, background-color .3s;
+}
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(1) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 0px; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(2) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 64px; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(3) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 128px; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(4) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 192px; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(5) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 256px; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(6) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 320px; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(7) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 384px; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(8) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 448px; }
+html body cu-sidebar.collapsed div.static-content ul.nav-list:has(> li:nth-child(9) > cu-navtab > a.cu-navtab__main-element_active)::before { opacity: 1; translate: -50% 512px; }
 
-  /* то же для чипов-фильтров и вкладок курса (Все / Обязательные…, Курс / Видеозаписи) */
+/* чипы-фильтры и вкладки курса (Все / Обязательные…, Курс / Видеозаписи):
+   подложка привязана к активному чипу через CSS anchor positioning.
+   Где его нет — у активного чипа обычный фон. */
+@supports (anchor-name: --a) {
   html body .tabs-container:has(> a.tab) { position: relative !important; }
   html body .tabs-container > a.tab { position: relative; z-index: 1; }
   html body :is(section.header-island, cu-course-overview) .tabs-container > a.tab.active {
@@ -1218,7 +1239,7 @@ html body main.main router-outlet + :not(cu-courses-group) {
 html body a.header__tab-link.header__tab-link_active { animation: s-indicator .45s var(--s-ease-dec); }
 
 /* карточки курсов — лесенкой, с пружиной */
-html body ul.course-list > li.course-list__item { animation: s-rise .6s var(--s-spring-soft) both; }
+html body ul.course-list > li.course-list__item { animation: s-rise .6s var(--s-spring-soft) backwards; }
 html body ul.course-list > li.course-list__item:nth-child(2)  { animation-delay: 30ms; }
 html body ul.course-list > li.course-list__item:nth-child(3)  { animation-delay: 60ms; }
 html body ul.course-list > li.course-list__item:nth-child(4)  { animation-delay: 90ms; }
@@ -1231,7 +1252,7 @@ html body ul.course-list > li.course-list__item:nth-child(n+9) { animation-delay
 /* темы курса, строки ведомостей и списки — въезжают по очереди */
 html body cu-course-content .themes-container > *,
 html body table.cu-table tbody tr,
-html body .culms-exams-week__course { animation: s-row .4s var(--s-ease-dec) both; }
+html body .culms-exams-week__course { animation: s-row .4s var(--s-ease-dec) backwards; }
 html body cu-course-content .themes-container > :nth-child(2), html body table.cu-table tbody tr:nth-child(2) { animation-delay: 25ms; }
 html body cu-course-content .themes-container > :nth-child(3), html body table.cu-table tbody tr:nth-child(3) { animation-delay: 50ms; }
 html body cu-course-content .themes-container > :nth-child(4), html body table.cu-table tbody tr:nth-child(4) { animation-delay: 75ms; }
@@ -1240,8 +1261,8 @@ html body cu-course-content .themes-container > :nth-child(6), html body table.c
 html body cu-course-content .themes-container > :nth-child(7), html body table.cu-table tbody tr:nth-child(7) { animation-delay: 150ms; }
 html body cu-course-content .themes-container > :nth-child(n+8), html body table.cu-table tbody tr:nth-child(n+8) { animation-delay: 175ms; }
 
-html body .culms-exams-dashboard { animation: s-enter .5s .12s var(--s-ease-dec) both; }
-html body cu-widgets-panel > section > * { animation: s-rise .55s var(--s-spring-soft) both; }
+html body .culms-exams-dashboard { animation: s-enter .5s .12s var(--s-ease-dec) backwards; }
+html body cu-widgets-panel > section > * { animation: s-rise .55s var(--s-spring-soft) backwards; }
 html body cu-widgets-panel > section > :nth-child(2) { animation-delay: 60ms; }
 html body cu-widgets-panel > section > :nth-child(3) { animation-delay: 120ms; }
 
@@ -1252,8 +1273,14 @@ html body :is([tuibutton], [tuiiconbutton], a.tab, a.header__tab-link, a.cu-navt
 html body :is([tuibutton], [tuiiconbutton], a.tab, a.header__tab-link, a.cu-navtab__main-element, .culms-deadlines__day):active { scale: .95; }
 html body li.course-list__item cu-course-card:active { scale: .97; }
 
-/* выпадашки, подсказки и диалоги */
-html body tui-dropdown, html body tui-hint, html body tui-dialog > .t-content { animation: s-pop .22s var(--s-spring) both; }
+/* выпадашки и подсказки. Своё animation на них ставить нельзя: Taiga снимает
+   класс .tui-enter (а с ним pointer-events: none) только когда на элементе
+   не осталось анимаций — с fill-mode both меню навсегда становилось
+   некликабельным. Поэтому только подкручиваем родную анимацию Taiga. */
+html body :is(tui-dropdown, tui-hint) { --tui-from: translateY(-6px) scale(.96) !important; transform-origin: top center; }
+html body :is(tui-dropdown, tui-hint).tui-enter { animation-duration: .22s !important; animation-timing-function: var(--s-spring) !important; }
+html body :is(tui-dropdown, tui-hint).tui-leave { animation-duration: .12s !important; animation-direction: reverse !important; }
+html body tui-dialog > .t-content { animation: s-pop .22s var(--s-spring) backwards; }
 
 /* плавная смена светлой/тёмной темы */
 html body :is(header.header, cu-sidebar, div.static-content, main.main, section.header-island, .culms-exams-dashboard, div.course-details, table.cu-table) {
